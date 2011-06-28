@@ -5,13 +5,15 @@
       android:versionName="1.0">
     <uses-sdk android:minSdkVersion="4" />
 
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".JeraPongGame"
-                  android:label="@string/app_name">
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
+        <activity android:name="SplashScreen" android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>			
+        </activity>
+        <activity android:name=".JeraPongGame" android:label="@string/app_name">
         </activity>
 
     </application>

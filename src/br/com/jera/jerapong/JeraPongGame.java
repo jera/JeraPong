@@ -2,8 +2,6 @@ package br.com.jera.jerapong;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
-import org.anddev.andengine.engine.handler.timer.ITimerCallback;
-import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -11,18 +9,13 @@ import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.sprite.Sprite;
-import org.anddev.andengine.entity.text.ChangeableText;
-import org.anddev.andengine.entity.util.FPSCounter;
 import org.anddev.andengine.input.touch.TouchEvent;
-import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.util.Log;
 
 public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListener {
@@ -32,8 +25,8 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 	private int CAMERA_WIDTH = 0;
 	private int CAMERA_HEIGHT = 0;
 	
-	private Font font;
-	private Texture textureFont;
+	//private Font font;
+	//private Texture textureFont;
 	
 	final int playerBorderOffset = 100;
 	
@@ -41,9 +34,9 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 	
 	/** ######## Splash Screen ######## **/
 	
-	private Texture textureBackgroundSplash;
+	/*private Texture textureBackgroundSplash;
 	
-	private TextureRegion textureRegionBackgroundSplash;
+	private TextureRegion textureRegionBackgroundSplash;*/
 	
 	/** ######## Splash Screen ######## **/
 	
@@ -81,8 +74,8 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 		CAMERA_HEIGHT = getWindowManager().getDefaultDisplay().getHeight();
 		CAMERA_WIDTH = getWindowManager().getDefaultDisplay().getWidth();
 		
-		Log.e("Largura", "" + CAMERA_WIDTH);
-		Log.e("Altura", "" + CAMERA_HEIGHT);
+		//Log.e("Largura", "" + CAMERA_WIDTH);
+		//Log.e("Altura", "" + CAMERA_HEIGHT);
 		
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		final EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
@@ -96,10 +89,10 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 		
 		Log.e("resources menu","loading");
 		
-		this.textureFont = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.font = new Font(this.textureFont, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32, true, Color.BLACK);
+		//this.textureFont = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		//this.font = new Font(this.textureFont, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32, true, Color.BLACK);
 		
-		this.textureBackgroundSplash = new Texture(1024, 1024, TextureOptions.DEFAULT);
+		//this.textureBackground = new Texture(512,512, TextureOptions.DEFAULT);
 		this.textureBackground = new Texture(1024, 1024, TextureOptions.DEFAULT);
 		this.textureNameGame = new Texture(256, 256, TextureOptions.DEFAULT);
 		this.textureSinglePlayer = new Texture(256,256,TextureOptions.DEFAULT);
@@ -108,7 +101,7 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 		this.textureCredits = new Texture(256,256,TextureOptions.DEFAULT);
 		this.textureExitGame = new Texture(256,256,TextureOptions.DEFAULT);
 		
-		this.textureRegionBackgroundSplash = TextureRegionFactory.createFromAsset(this.textureBackgroundSplash, this, "gfx/splash_jera.png",0,0);
+		//this.textureRegionBackground= TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/splash_jera.png",0,0);
 		this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/menu_background.png",0,0);
 		this.textureRegionNamegame = TextureRegionFactory.createFromAsset(this.textureNameGame, this, "gfx/menu_name_game.png",0,0);
 		this.textureRegionSinglePlayer = TextureRegionFactory.createFromAsset(this.textureSinglePlayer, this, "gfx/menu_single_player.png",0,0);
@@ -117,7 +110,7 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 		this.textureRegionCredits = TextureRegionFactory.createFromAsset(this.textureCredits, this, "gfx/menu_creditos.png",0,0);
 		this.textureRegionExitGame = TextureRegionFactory.createFromAsset(this.textureExitGame, this, "gfx/menu_exit_game.png",0,0);
 		
-		this.mEngine.getTextureManager().loadTexture(this.textureBackgroundSplash);
+		//this.mEngine.getTextureManager().loadTexture(this.textureBackground);
 		this.mEngine.getTextureManager().loadTexture(this.textureBackground);
 		this.mEngine.getTextureManager().loadTexture(this.textureNameGame);
 		this.mEngine.getTextureManager().loadTexture(this.textureSinglePlayer);
@@ -125,8 +118,8 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 		this.mEngine.getTextureManager().loadTexture(this.textureExitGame);
 		this.mEngine.getTextureManager().loadTexture(this.textureScore);
 		this.mEngine.getTextureManager().loadTexture(this.textureCredits);
-		this.mEngine.getTextureManager().loadTexture(this.textureFont);
-		this.mEngine.getFontManager().loadFont(this.font);
+		//this.mEngine.getTextureManager().loadTexture(this.textureFont);
+		//this.mEngine.getFontManager().loadFont(this.font);
 		
 		Log.e("resources menu","ok");
 		
@@ -134,57 +127,14 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 
 	@Override
 	public Scene onLoadScene() {
-Log.e("scene screen splash", "loading");
-		
-		final Scene scene = new Scene();
-		scene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
-		
-		final FPSCounter fpsCounter = new FPSCounter();
-		this.mEngine.registerUpdateHandler(fpsCounter);
-		
-		final Sprite background = new Sprite(0, 0, this.textureRegionBackgroundSplash);
-		scene.attachChild(background);
-		
-		final ChangeableText elapsedText = new ChangeableText(100, 160, this.font, "Seconds elapsed:", "Seconds elapsed: XXXXX".length());
-		final ChangeableText fpsText = new ChangeableText(250, 240, this.font, "FPS:", "FPS: XXXXX".length());
-
-		scene.attachChild(elapsedText);
-		scene.attachChild(fpsText);
-
-		scene.registerUpdateHandler(new TimerHandler(1 / 20.0f, true, new ITimerCallback() {
-			@Override
-			public void onTimePassed(final TimerHandler pTimerHandler) {
-				
-				int splashTime = (int)JeraPongGame.this.mEngine.getSecondsElapsedTotal();
-				elapsedText.setText("Seconds elapsed: " + JeraPongGame.this.mEngine.getSecondsElapsedTotal());
-				fpsText.setText("FPS: " + fpsCounter.getFPS());
-				
-				if(splashTime >= 10){
-					mEngine.setScene(SceneMenu());
-				}
-			}
-		}));
-		
-		Log.e("scene screen splash", "OK");
-		
-		return scene;
-	}
-
-	@Override
-	public void onLoadComplete() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-public Scene SceneMenu(){
-		
-		Log.e("scene", "loading");
-		
 		final Scene scene = new Scene(1);		
 		scene.setBackground(new ColorBackground(1,1,1));//0.09804f, 0.6274f, 0.8784f));
 		scene.setOnSceneTouchListener(this);
 		
 		//---BackGround---
+		this.textureBackground.clearTextureSources();
+		//scene.set
+		//TextureRegionFactory.createFromAsset(this.textureBackground,this, pAssetPath)
 		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
 		scene.attachChild(background);
 		
@@ -257,6 +207,12 @@ public Scene SceneMenu(){
 		return scene;
 	}
 
+	@Override
+	public void onLoadComplete() {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
 		
