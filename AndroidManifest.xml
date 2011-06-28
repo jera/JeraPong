@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="br.com.jera.jerapong"
-      android:versionCode="1"
-      android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="4" />
+<manifest
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	package="br.com.jera.jerapong"
+	android:versionCode="1"
+	android:versionName="1.0">
+	<uses-sdk
+		android:minSdkVersion="4" />
 
-	<uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
-        <activity android:name="SplashScreen" android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>			
-        </activity>
-        <activity android:name=".JeraPongGame" android:label="@string/app_name">
-        </activity>
+	<uses-permission
+		android:name="android.permission.WAKE_LOCK" />
+	<application
+		android:icon="@drawable/icon"
+		android:label="@string/app_name"
+		android:debuggable="true">
+		<activity
+			android:name="SplashScreen"
+			android:label="@string/app_name">
+			<intent-filter>
+				<action
+					android:name="android.intent.action.MAIN" />
+				<category
+					android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity
+			android:name=".MenuScreen"
+			android:label="@string/app_name">
+		</activity>
+		<activity
+			android:name=".JeraPongGame"
+			android:label="@string/app_name">
+		</activity>
 
-    </application>
+	</application>
 </manifest>
