@@ -54,7 +54,7 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 	
 	private PhysicsWorld physicWorld;
 	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10000000000f, 1.2f, 0f);
-	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(2f, 1f, 0f);
+	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(2f, 1f, 1f);
 	
 	private Sprite spritePlayer1;
     private Body bodyPlayer1;
@@ -66,7 +66,8 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
     private Body bodyBall;
     
     final float PHYSICS_RATE = 21.81818182f;
-    final float MAXIMUM_BALL_SPEED = 50f;        
+    final float MAXIMUM_BALL_SPEED = 50f;
+    final float MINIMUM_BALL_SPEED = 5f;
 	
 	final int playerBorderOffset = 100;
 	
@@ -136,7 +137,7 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
         final Shape left = new Rectangle(0, 0, 2, CAMERA_HEIGHT);
         final Shape right = new Rectangle(CAMERA_WIDTH - 2, 0, 2, CAMERA_HEIGHT);
         
-        final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(1000000000f, 1f, 0.1f);
+        final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(1000000000f, 1f, 1.5f);
         PhysicsFactory.createBoxBody(this.physicWorld, ground, BodyType.StaticBody, wallFixtureDef);
         PhysicsFactory.createBoxBody(this.physicWorld, roof, BodyType.StaticBody, wallFixtureDef);
         PhysicsFactory.createBoxBody(this.physicWorld, left, BodyType.StaticBody, wallFixtureDef);
@@ -184,33 +185,33 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 	}
 	
 	@Override
-    public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
-            float positionYToPutPlayer;
-            float positionTouchX;
-            float positionTouchY;
-            float screenLimitY;
+	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
+		float positionYToPutPlayer;
+		float positionTouchX;
+		float positionTouchY;
+		float screenLimitY;
 
-            if(this.physicWorld != null){
-                    positionTouchX = pSceneTouchEvent.getX();
-                    positionTouchY = pSceneTouchEvent.getY();
-                    positionYToPutPlayer = positionTouchY / PHYSICS_RATE;
-                    screenLimitY = this.CAMERA_HEIGHT / PHYSICS_RATE;                        
-                    if(positionTouchX < CAMERA_WIDTH / 2){
-                            if(positionTouchX < this.spritePlayer1.getX() + this.spritePlayer1.getWidth()){
-                                    positionYToPutPlayer -= (this.spritePlayer1.getHeight() / PHYSICS_RATE) / 2f;
-                                    this.bodyPlayer1.setTransform(ColisionWall(spritePlayer1, bodyPlayer1, screenLimitY, positionYToPutPlayer),0);
-                            }
-                    }
-                    else if(positionTouchX >= CAMERA_WIDTH / 2){
-                            if(positionTouchX > this.spritePlayer2.getX()){
-                                    positionYToPutPlayer -= (this.spritePlayer2.getHeight() / PHYSICS_RATE) / 2f;
-                                    this.bodyPlayer2.setTransform(ColisionWall(spritePlayer2, bodyPlayer2, screenLimitY, positionYToPutPlayer),0);
-                            }
-                            
-                    }
-            }
-            return false;
-    }
+		if(this.physicWorld != null){
+			positionTouchX = pSceneTouchEvent.getX();
+			positionTouchY = pSceneTouchEvent.getY();
+			positionYToPutPlayer = positionTouchY / PHYSICS_RATE;
+			screenLimitY = this.CAMERA_HEIGHT / PHYSICS_RATE;                        
+			if(positionTouchX < CAMERA_WIDTH / 2){
+				if(positionTouchX < this.spritePlayer1.getX() + this.spritePlayer1.getWidth()){
+					positionYToPutPlayer -= (this.spritePlayer1.getHeight() / PHYSICS_RATE) / 2f;
+					this.bodyPlayer1.setTransform(ColisionWall(spritePlayer1, bodyPlayer1, screenLimitY, positionYToPutPlayer),0);
+				}
+			}
+			else if(positionTouchX >= CAMERA_WIDTH / 2){
+				if(positionTouchX > this.spritePlayer2.getX()){
+					positionYToPutPlayer -= (this.spritePlayer2.getHeight() / PHYSICS_RATE) / 2f;
+					this.bodyPlayer2.setTransform(ColisionWall(spritePlayer2, bodyPlayer2, screenLimitY, positionYToPutPlayer),0);
+				}
+
+			}
+		}
+		return false;
+	}
 	
 	public Vector2 ColisionWall(Sprite sprite, Body body, float limitY, float positionY){
         Vector2 finalPosition = new Vector2(0,0);
@@ -237,20 +238,25 @@ public class JeraPongGame extends BaseGameActivity implements IOnSceneTouchListe
 
 	@Override
 	public void endContact(Contact contact) {
-		
-		Vector2 speed1 = contact.getFixtureA().getBody().getLinearVelocity();
-        Vector2 speed2 = contact.getFixtureB().getBody().getLinearVelocity();
-        if(speed1.len() > MAXIMUM_BALL_SPEED){
-                float speedX = (MAXIMUM_BALL_SPEED / speed1.len()) * speed1.x;
-                float speedY = (MAXIMUM_BALL_SPEED / speed1.len()) * speed1.y;
-                contact.getFixtureA().getBody().setLinearVelocity(new Vector2(speedX,speedY));
+		//Limita velocidades: 4 < vel < 50		 
+		Vector2 speedBall = bodyBall.getLinearVelocity();
+        if(speedBall.len() > MAXIMUM_BALL_SPEED){
+                float speedX = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.x;
+                float speedY = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.y;
+                bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
+                Log.e("vel x:"," " +  bodyBall.getLinearVelocity().x);
         }
-        if(speed2.len() > MAXIMUM_BALL_SPEED){
-                float speedX = (MAXIMUM_BALL_SPEED / speed2.len()) * speed2.x;
-                float speedY = (MAXIMUM_BALL_SPEED / speed2.len()) * speed2.y;
-                contact.getFixtureB().getBody().setLinearVelocity(new Vector2(speedX,speedY));
+        if(Math.abs(speedBall.x) < MINIMUM_BALL_SPEED){
+        	float speedX;
+        	if(speedBall.x < 0){
+        		speedX = MINIMUM_BALL_SPEED * -1f;
+        	}
+        	else{
+        		speedX = MINIMUM_BALL_SPEED;
+        	}
+        	float speedY = bodyBall.getLinearVelocity().y;
+        	bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
         }
-		
 	}
 
 	@Override

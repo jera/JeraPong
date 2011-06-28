@@ -16,7 +16,6 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
-import android.app.Activity;
 import android.util.Log;
 
 public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListener {
@@ -27,7 +26,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	private int CAMERA_HEIGHT = 0;
 	
 	
-	private JeraPongGame game;
+	//private JeraPongGame game;
 	/** ######## GLOBAL ######## **/
 	
 	/** ######## MENU ######## **/
