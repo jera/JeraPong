@@ -173,7 +173,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
 		scene.attachChild(background);
 
-		//--Player 1--
+		//Player 1
 		final int player1PositionX = PLAYER_BORDER_OFFSET;
 		final int player1PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;
 		this.spritePlayer1 = new Sprite(player1PositionX,player1PositionY, this.textureRegionPlayer1){
