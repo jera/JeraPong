@@ -7,17 +7,18 @@ import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
-import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.util.FPSLogger;
-import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
-import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
-import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
-import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
 import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
+import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
+import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
+import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
+import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
+import org.anddev.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
+import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
@@ -91,18 +92,13 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		//engineOptions.getTouchOptions().setRunOnUpdateThread(true);
 		
 		try {
-			if(MultiTouch.isSupported(this)) {				
+			if(MultiTouch.isSupported(this)) {
 				engine.setTouchController(new MultiTouchController());
-				if(MultiTouch.isSupportedDistinct(this)) {
-					Toast.makeText(this, "MultiTouch detected --> Drag multiple Sprites with multiple fingers!", Toast.LENGTH_LONG).show();
-				} else {
-					Toast.makeText(this, "MultiTouch detected --> Drag multiple Sprites with multiple fingers!\n\n(Your device might have problems to distinguish between separate fingers.)", Toast.LENGTH_LONG).show();
-				}
 			} else {
-				Toast.makeText(this, "Sorry your device does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "This device does not support multitouch", Toast.LENGTH_LONG).show();
 			}
 		} catch (final MultiTouchException e) {
-			Toast.makeText(this, "Sorry your Android Version does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "This android does not support multitouch", Toast.LENGTH_LONG).show();
 		}
 		
 		return engine;
@@ -185,7 +181,8 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {					
 					case TouchEvent.ACTION_MOVE:
-						spritePlayer1.setPosition(spritePlayer1.getX(),pSceneTouchEvent.getY() - (spritePlayer1.getHeight() / 2));
+						Vector2 newPosition = Vector2Pool.obtain((pSceneTouchEvent.getX() - spritePlayer1.getWidth() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, (pSceneTouchEvent.getY() - spritePlayer1.getHeight() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
+						bodyPlayer1.setTransform(newPosition, 0);						
 						break;					
 				}
 				return true;
@@ -205,13 +202,12 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {					
 					case TouchEvent.ACTION_MOVE:
-						spritePlayer2.setPosition(spritePlayer2.getX(),pSceneTouchEvent.getY() - (spritePlayer2.getHeight() / 2));
+						Vector2 newPosition = Vector2Pool.obtain((pSceneTouchEvent.getX() - spritePlayer2.getWidth() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, (pSceneTouchEvent.getY() - spritePlayer2.getHeight() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
+						bodyPlayer2.setTransform(newPosition, 0);						
 						break;					
 				}
 				return true;
 			}
-			
-			
 		};
 		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.DynamicBody,FIXTURE_PLAYERS);                
 		scene.getLastChild().attachChild(spritePlayer2);
