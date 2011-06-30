@@ -7,6 +7,7 @@ import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
+import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
@@ -56,13 +57,13 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	private Texture texturePlacar;
 
 
-	private TextureRegion textureRegionBackground;
+	//private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionPlayer1;
 	private TextureRegion textureRegionPlayer2;
 	private TextureRegion textureRegionBall;
 
 	private PhysicsWorld physicWorld;
-	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(5000000000f, 1.2f, 0f);
+	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.2f, 0f);
 	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(1f, 1f, 0f); //densidade,restituição,frição
 
 	private Sprite spritePlayer1;
@@ -86,8 +87,12 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	final float MAXIMUM_BALL_SPEED = 40f;
 	final float MINIMUM_BALL_SPEED = 5f;
 	final float WALL_WIDTH = 2;
+	float speedX = 0;
+	float speedY = 0;
+	boolean refreshVelocity = false;
 
 	final int PLAYER_BORDER_OFFSET = 100;
+	boolean removeBall = false;
 
 
 	/** ######## GAME ######## **/
@@ -125,11 +130,11 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		this.textureBall = new Texture(64,64,TextureOptions.DEFAULT);
 		this.texturePlacar = new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
-		this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/background.png",0,0);
+		//this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/background.png",0,0);
 		this.textureRegionPlayer1 = TextureRegionFactory.createFromAsset(this.texturePlayer1, this, "gfx/player.png",0,0);
 		this.textureRegionPlayer2 = TextureRegionFactory.createFromAsset(this.texturePlayer2, this, "gfx/player.png",0,0);
 		this.textureRegionBall = TextureRegionFactory.createFromAsset(this.textureBall, this, "gfx/ball.png",0,0);		
-		this.fontPlacar = new Font(this.texturePlacar, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.BLACK);
+		this.fontPlacar = new Font(this.texturePlacar, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE);
 
 		this.mEngine.getTextureManager().loadTexture(this.textureBackground);
 		this.mEngine.getTextureManager().loadTexture(this.texturePlayer1);
@@ -168,8 +173,9 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		scene.registerUpdateHandler(this.physicWorld);
 
 		//---BackGround---
-		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
-		scene.attachChild(background);
+		//final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
+		//scene.attachChild(background);
+		scene.setBackground(new ColorBackground(0f,0f,0f));
 
 		placarPlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontPlacar,"0","0".length());
 		placarPlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontPlacar,"0","0".length());
@@ -193,7 +199,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 				return true;
 			}
 		};
-		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer1,BodyType.DynamicBody,FIXTURE_PLAYERS);
+		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer1,BodyType.StaticBody,FIXTURE_PLAYERS);
 		scene.registerTouchArea(spritePlayer1);
 		scene.getLastChild().attachChild(spritePlayer1);		
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer1, this.bodyPlayer1, true, true));
@@ -215,7 +221,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 				return true;
 			}
 		};		
-		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.DynamicBody,FIXTURE_PLAYERS);
+		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.StaticBody,FIXTURE_PLAYERS);
 		scene.registerTouchArea(spritePlayer2);
 		scene.getLastChild().attachChild(spritePlayer2);		
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer2, this.bodyPlayer2, true, true));
@@ -226,7 +232,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
 		scene.getLastChild().attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-		this.bodyBall.setLinearVelocity(70,20);
+		this.bodyBall.setLinearVelocity(70,0);
 		//this.bodyBall.applyLinearImpulse(new Vector2(20,5),this.bodyBall.getPosition());
 
 		scene.setTouchAreaBindingEnabled(true);
@@ -291,34 +297,64 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	public void beginContact(Contact contact) {		
 		Body bodyContact1 = contact.getFixtureA().getBody();
 		Body bodyContact2 = contact.getFixtureB().getBody();
-		Log.e("uia","e");
-		if(bodyContact1.equals(bodyLeft) || bodyContact2.equals(bodyLeft)){
-			this.placarPlayer2.setText("" + ++pointsPlayer2);		
-			destroyBodyBall();
-		}else if(bodyContact1.equals(bodyRight) || bodyContact2.equals(bodyRight)){
-			this.placarPlayer1.setText("" + ++pointsPlayer1);			
-			destroyBodyBall();
-		}
+		if(bodyContact1.equals(bodyBall) || bodyContact2.equals(bodyBall)){
+			if(bodyContact1.equals(bodyLeft) || bodyContact2.equals(bodyLeft)){
+				this.placarPlayer2.setText("" + ++this.pointsPlayer2);
+				removeBall = true;
+			}else if(bodyContact1.equals(bodyRight) || bodyContact2.equals(bodyRight)){
+				this.placarPlayer1.setText("" + ++this.pointsPlayer1);
+				removeBall = true;
+			}			
+		}		
+		this.runOnUpdateThread(new Runnable() {
+			@Override
+			public void run() {		    	 
+				if(removeBall){
+					final Scene scene = mEngine.getScene();
+					final PhysicsConnector physicsConnectorBall = physicWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(spriteBall);
+					physicWorld.unregisterPhysicsConnector(physicsConnectorBall);
+					physicWorld.destroyBody(physicsConnectorBall.getBody());
+					scene.unregisterTouchArea(spriteBall);
+					scene.getLastChild().detachChild(spriteBall);
+					removeBall = false;
+					spriteBall.setPosition((CAMERA_WIDTH / 2) - (textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (textureRegionBall.getHeight() / 2));
+					bodyBall = PhysicsFactory.createCircleBody(physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
+					scene.getLastChild().attachChild(spriteBall);
+					physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
+					bodyBall.setLinearVelocity(50f,10f);
+				}
+			}
+		});
+
 	}
 
 	@Override
 	public void endContact(Contact contact) {
 		//Limita velocidades: 4 < vel < 50		 
-		Vector2 speedBall = bodyBall.getLinearVelocity();
-		//Log.e("vel x"," " +  speedBall);
-		//Log.e("vel x"," " + bodyPlayer1.getLinearVelocity().x);
+		Vector2 speedBall = bodyBall.getLinearVelocity();		
+		Log.e("vel"," " + speedBall.x + " - " + speedBall.y);
 		if(speedBall.len() > MAXIMUM_BALL_SPEED){
-			float speedX = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.x;
-			float speedY = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.y;
-			bodyBall.setLinearVelocity(new Vector2(speedX,speedY));			
+			speedX = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.x;
+			speedY = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.y;
+			refreshVelocity = true;			
 		}
 		if(Math.abs(speedBall.x) < MINIMUM_BALL_SPEED){
-			float speedX;
 			if(speedBall.x < 0) speedX = MINIMUM_BALL_SPEED * -1f;
 			else speedX = MINIMUM_BALL_SPEED;
-			float speedY = bodyBall.getLinearVelocity().y;
-			bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
-		}		
+			speedY = bodyBall.getLinearVelocity().y;
+			refreshVelocity = true;
+		}
+		this.runOnUpdateThread(new Runnable() {
+			@Override
+			public void run() {
+				if(refreshVelocity){					
+					Log.e("vel"," " + speedX + " - " + speedY);
+					bodyBall.setLinearVelocity(new Vector2(speedX,speedY));					
+					refreshVelocity = false;
+				}				
+			}
+		});
+
 	}
 
 	@Override
@@ -330,17 +366,5 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	public void postSolve(Contact pContact) {
 
 	}
-	
-	public void destroyBodyBall(){
-		bodyBall.setActive(false);
-		final Scene scene = this.mEngine.getScene();
-		final PhysicsConnector physicsConnectorBall = this.physicWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(spriteBall);
-		this.physicWorld.unregisterPhysicsConnector(physicsConnectorBall);
-        this.physicWorld.destroyBody(physicsConnectorBall.getBody());
-        scene.unregisterTouchArea(spriteBall);
-        scene.getLastChild().detachChild(spriteBall);
-        
-	}
-
 
 }
