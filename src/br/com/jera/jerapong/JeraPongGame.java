@@ -143,7 +143,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	@Override
 	public Scene onLoadScene() {
 		this.mEngine.registerUpdateHandler(new FPSLogger());
-		final Scene scene = new Scene(1);
+		final Scene scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
 
 		this.physicWorld = new PhysicsWorld(new Vector2(0,0),false);
@@ -193,9 +193,9 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 				return true;
 			}
 		};
-		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer1,BodyType.DynamicBody,FIXTURE_PLAYERS);		
-		scene.getLastChild().attachChild(spritePlayer1);
+		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer1,BodyType.DynamicBody,FIXTURE_PLAYERS);
 		scene.registerTouchArea(spritePlayer1);
+		scene.getLastChild().attachChild(spritePlayer1);		
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer1, this.bodyPlayer1, true, true));
 		this.bodyPlayer1.setFixedRotation(true);
 
@@ -215,9 +215,9 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 				return true;
 			}
 		};		
-		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.DynamicBody,FIXTURE_PLAYERS);                
-		scene.getLastChild().attachChild(spritePlayer2);
+		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.DynamicBody,FIXTURE_PLAYERS);
 		scene.registerTouchArea(spritePlayer2);
+		scene.getLastChild().attachChild(spritePlayer2);		
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer2, this.bodyPlayer2, true, true));
 		this.bodyPlayer2.setFixedRotation(true);
 
@@ -288,16 +288,17 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	}*/
 
 	@Override
-	public void beginContact(Contact contact) {
+	public void beginContact(Contact contact) {		
 		Body bodyContact1 = contact.getFixtureA().getBody();
 		Body bodyContact2 = contact.getFixtureB().getBody();
 		Log.e("uia","e");
 		if(bodyContact1.equals(bodyLeft) || bodyContact2.equals(bodyLeft)){
-			this.placarPlayer2.setText("" + ++pointsPlayer2);
+			this.placarPlayer2.setText("" + ++pointsPlayer2);		
+			destroyBodyBall();
 		}else if(bodyContact1.equals(bodyRight) || bodyContact2.equals(bodyRight)){
-			this.placarPlayer1.setText("" + ++pointsPlayer1);
+			this.placarPlayer1.setText("" + ++pointsPlayer1);			
+			destroyBodyBall();
 		}
-
 	}
 
 	@Override
@@ -328,7 +329,18 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	@Override
 	public void postSolve(Contact pContact) {
 
-
 	}
+	
+	public void destroyBodyBall(){
+		bodyBall.setActive(false);
+		final Scene scene = this.mEngine.getScene();
+		final PhysicsConnector physicsConnectorBall = this.physicWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(spriteBall);
+		this.physicWorld.unregisterPhysicsConnector(physicsConnectorBall);
+        this.physicWorld.destroyBody(physicsConnectorBall.getBody());
+        scene.unregisterTouchArea(spriteBall);
+        scene.getLastChild().detachChild(spriteBall);
+        
+	}
+
 
 }
