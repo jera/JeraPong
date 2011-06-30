@@ -9,6 +9,7 @@ import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
+import org.anddev.andengine.entity.text.ChangeableText;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
@@ -16,15 +17,17 @@ import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
 import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
-import org.anddev.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.anddev.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.anddev.andengine.input.touch.TouchEvent;
+import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -50,6 +53,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	private Texture texturePlayer1;
 	private Texture texturePlayer2;
 	private Texture textureBall;
+	private Texture texturePlacar;
 
 
 	private TextureRegion textureRegionBackground;
@@ -58,8 +62,8 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	private TextureRegion textureRegionBall;
 
 	private PhysicsWorld physicWorld;
-	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10000000000f, 1.2f, 0f);
-	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(2f, 1f, 1f);
+	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(5000000000f, 1.2f, 0f);
+	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(1f, 1f, 0f); //densidade,restituição,frição
 
 	private Sprite spritePlayer1;
 	private Body bodyPlayer1;
@@ -70,8 +74,16 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	private Sprite spriteBall;
 	private Body bodyBall;
 
-	final float PHYSICS_RATE = 21.81818182f;
-	final float MAXIMUM_BALL_SPEED = 50f;
+	private Font fontPlacar;
+	private int pointsPlayer1 = 0;
+	private int pointsPlayer2 = 0;
+	private ChangeableText placarPlayer1;
+	private ChangeableText placarPlayer2;
+
+	private Body bodyLeft;
+	private Body bodyRight;
+
+	final float MAXIMUM_BALL_SPEED = 40f;
 	final float MINIMUM_BALL_SPEED = 5f;
 	final float WALL_WIDTH = 2;
 
@@ -90,7 +102,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		final EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
 		final Engine engine = new Engine(engineOptions); 
 		//engineOptions.getTouchOptions().setRunOnUpdateThread(true);
-		
+
 		try {
 			if(MultiTouch.isSupported(this)) {
 				engine.setTouchController(new MultiTouchController());
@@ -100,7 +112,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		} catch (final MultiTouchException e) {
 			Toast.makeText(this, "This android does not support multitouch", Toast.LENGTH_LONG).show();
 		}
-		
+
 		return engine;
 	}
 
@@ -111,45 +123,31 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		this.texturePlayer1 = new Texture(256,256,TextureOptions.DEFAULT);
 		this.texturePlayer2 = new Texture(256,256,TextureOptions.DEFAULT);
 		this.textureBall = new Texture(64,64,TextureOptions.DEFAULT);
+		this.texturePlacar = new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 		this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/background.png",0,0);
 		this.textureRegionPlayer1 = TextureRegionFactory.createFromAsset(this.texturePlayer1, this, "gfx/player.png",0,0);
 		this.textureRegionPlayer2 = TextureRegionFactory.createFromAsset(this.texturePlayer2, this, "gfx/player.png",0,0);
-		this.textureRegionBall = TextureRegionFactory.createFromAsset(this.textureBall, this, "gfx/ball.png",0,0);
+		this.textureRegionBall = TextureRegionFactory.createFromAsset(this.textureBall, this, "gfx/ball.png",0,0);		
+		this.fontPlacar = new Font(this.texturePlacar, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.BLACK);
 
 		this.mEngine.getTextureManager().loadTexture(this.textureBackground);
 		this.mEngine.getTextureManager().loadTexture(this.texturePlayer1);
 		this.mEngine.getTextureManager().loadTexture(this.texturePlayer2);
 		this.mEngine.getTextureManager().loadTexture(this.textureBall);
+		this.mEngine.getTextureManager().loadTexture(this.texturePlacar);
+		this.mEngine.getFontManager().loadFont(this.fontPlacar);
 
 	}
 
 	@Override
 	public Scene onLoadScene() {
-
-		/*this.textureBackground = new Texture(1024, 1024, TextureOptions.DEFAULT);
-		this.texturePlayer1 = new Texture(256,256,TextureOptions.DEFAULT);
-		this.texturePlayer2 = new Texture(256,256,TextureOptions.DEFAULT);
-		this.textureBall = new Texture(64,64,TextureOptions.DEFAULT);
-
-		this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/background.png",0,0);
-		this.textureRegionPlayer1 = TextureRegionFactory.createFromAsset(this.texturePlayer1, this, "gfx/player.png",0,0);
-		this.textureRegionPlayer2 = TextureRegionFactory.createFromAsset(this.texturePlayer2, this, "gfx/player.png",0,0);
-		this.textureRegionBall = TextureRegionFactory.createFromAsset(this.textureBall, this, "gfx/ball.png",0,0);
-
-		this.mEngine.getTextureManager().loadTexture(this.textureBackground);
-		this.mEngine.getTextureManager().loadTexture(this.texturePlayer1);
-		this.mEngine.getTextureManager().loadTexture(this.texturePlayer2);
-		this.mEngine.getTextureManager().loadTexture(this.textureBall);*/
 		this.mEngine.registerUpdateHandler(new FPSLogger());
 		final Scene scene = new Scene(1);
-		//scene.setOnSceneTouchListener(this);
 		scene.setOnAreaTouchTraversalFrontToBack();
-		//scene.setBackground(new ColorBackground(1f, 0, 0));
-		Log.e("world fisics","loading");
-		this.physicWorld = new PhysicsWorld(new Vector2(0,0),false);//SensorManager.GRAVITY_EARTH),false);
+
+		this.physicWorld = new PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
-		Log.e("world fisics", "ok");
 
 		final Shape ground = new Rectangle(0, CAMERA_HEIGHT - 2, CAMERA_WIDTH, 2);
 		final Shape roof = new Rectangle(0, 0, CAMERA_WIDTH, 2);
@@ -159,8 +157,8 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(1000000000f, 1f, 1.5f);
 		PhysicsFactory.createBoxBody(this.physicWorld, ground, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(this.physicWorld, roof, BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(this.physicWorld, left, BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(this.physicWorld, right, BodyType.StaticBody, wallFixtureDef);
+		this.bodyLeft = PhysicsFactory.createBoxBody(this.physicWorld, left, BodyType.StaticBody, wallFixtureDef);
+		this.bodyRight = PhysicsFactory.createBoxBody(this.physicWorld, right, BodyType.StaticBody, wallFixtureDef);
 
 		scene.getFirstChild().attachChild(ground);
 		scene.getFirstChild().attachChild(roof);
@@ -173,42 +171,50 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
 		scene.attachChild(background);
 
+		placarPlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontPlacar,"0","0".length());
+		placarPlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontPlacar,"0","0".length());
+
+		scene.getLastChild().attachChild(placarPlayer1);		
+		scene.getLastChild().attachChild(placarPlayer2);
+
 		//Player 1
-		final int player1PositionX = PLAYER_BORDER_OFFSET;
+		//final int player1PositionX = PLAYER_BORDER_OFFSET;
+		final int player1PositionX = 10;
 		final int player1PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;
 		this.spritePlayer1 = new Sprite(player1PositionX,player1PositionY, this.textureRegionPlayer1){
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {					
-					case TouchEvent.ACTION_MOVE:
-						Vector2 newPosition = Vector2Pool.obtain((pSceneTouchEvent.getX() - spritePlayer1.getWidth() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, (pSceneTouchEvent.getY() - spritePlayer1.getHeight() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-						bodyPlayer1.setTransform(newPosition, 0);						
-						break;					
+				case TouchEvent.ACTION_MOVE:
+					Vector2 newPosition = new Vector2(bodyPlayer1.getPosition().x, pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
+					bodyPlayer1.setTransform(newPosition, 0);												
+					break;
 				}
 				return true;
 			}
 		};
-		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer1,BodyType.DynamicBody,FIXTURE_PLAYERS);                
+		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer1,BodyType.DynamicBody,FIXTURE_PLAYERS);		
 		scene.getLastChild().attachChild(spritePlayer1);
 		scene.registerTouchArea(spritePlayer1);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer1, this.bodyPlayer1, true, true));
 		this.bodyPlayer1.setFixedRotation(true);
 
 		//--Player 2--
-		final int player2PositionX = CAMERA_WIDTH - PLAYER_BORDER_OFFSET - textureRegionPlayer2.getWidth();
+		final int player2PositionX = CAMERA_WIDTH - textureRegionPlayer2.getWidth() - 10;
 		final int player2PositionY =  (CAMERA_HEIGHT / 2) - this.textureRegionPlayer2.getHeight() / 2;
+		this.textureRegionPlayer2.setFlippedHorizontal(true);
 		this.spritePlayer2 = new Sprite(player2PositionX,player2PositionY, this.textureRegionPlayer2){
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {					
-					case TouchEvent.ACTION_MOVE:
-						Vector2 newPosition = Vector2Pool.obtain((pSceneTouchEvent.getX() - spritePlayer2.getWidth() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, (pSceneTouchEvent.getY() - spritePlayer2.getHeight() * 0.5f) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-						bodyPlayer2.setTransform(newPosition, 0);						
-						break;					
+				case TouchEvent.ACTION_MOVE:
+					Vector2 newPosition = new Vector2(bodyPlayer2.getPosition().x, pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);						
+					bodyPlayer2.setTransform(newPosition, 0);						
+					break;					
 				}
 				return true;
 			}
-		};
+		};		
 		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.DynamicBody,FIXTURE_PLAYERS);                
 		scene.getLastChild().attachChild(spritePlayer2);
 		scene.registerTouchArea(spritePlayer2);
@@ -220,16 +226,18 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
 		scene.getLastChild().attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-		this.bodyBall.setLinearVelocity(70,0);
-		
+		this.bodyBall.setLinearVelocity(70,20);
+		//this.bodyBall.applyLinearImpulse(new Vector2(20,5),this.bodyBall.getPosition());
+
 		scene.setTouchAreaBindingEnabled(true);
 
 		return scene;
 	}
 
+
+
 	@Override
 	public void onLoadComplete() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -262,7 +270,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		return false;
 	}*/
 
-	public Vector2 ColisionWall(Sprite sprite, Body body, float limitY, float positionY){
+	/*public Vector2 ColisionWall(Sprite sprite, Body body, float limitY, float positionY){
 		Vector2 finalPosition = new Vector2(0,0);
 
 		finalPosition.x = body.getPosition().x;
@@ -277,11 +285,18 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 			finalPosition.y = positionY;
 		}
 		return finalPosition;                
-	}
+	}*/
 
 	@Override
 	public void beginContact(Contact contact) {
-		// TODO Auto-generated method stub
+		Body bodyContact1 = contact.getFixtureA().getBody();
+		Body bodyContact2 = contact.getFixtureB().getBody();
+		Log.e("uia","e");
+		if(bodyContact1.equals(bodyLeft) || bodyContact2.equals(bodyLeft)){
+			this.placarPlayer2.setText("" + ++pointsPlayer2);
+		}else if(bodyContact1.equals(bodyRight) || bodyContact2.equals(bodyRight)){
+			this.placarPlayer1.setText("" + ++pointsPlayer1);
+		}
 
 	}
 
@@ -289,11 +304,12 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	public void endContact(Contact contact) {
 		//Limita velocidades: 4 < vel < 50		 
 		Vector2 speedBall = bodyBall.getLinearVelocity();
+		//Log.e("vel x"," " +  speedBall);
+		//Log.e("vel x"," " + bodyPlayer1.getLinearVelocity().x);
 		if(speedBall.len() > MAXIMUM_BALL_SPEED){
 			float speedX = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.x;
 			float speedY = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.y;
-			bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
-			Log.e("vel x:"," " +  bodyBall.getLinearVelocity().x);
+			bodyBall.setLinearVelocity(new Vector2(speedX,speedY));			
 		}
 		if(Math.abs(speedBall.x) < MINIMUM_BALL_SPEED){
 			float speedX;
@@ -301,18 +317,17 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 			else speedX = MINIMUM_BALL_SPEED;
 			float speedY = bodyBall.getLinearVelocity().y;
 			bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
-		}
+		}		
 	}
 
 	@Override
 	public void preSolve(Contact pContact) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void postSolve(Contact pContact) {
-		// TODO Auto-generated method stub
+
 
 	}
 
