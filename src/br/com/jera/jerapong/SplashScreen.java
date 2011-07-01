@@ -29,7 +29,7 @@ public class SplashScreen extends BaseSplashActivity {
 
 	@Override
 	protected Class<? extends Activity> getFollowUpActivity() {
-		return JeraPongGame.class;
+		return MenuScreen.class;
 	}
 
 }

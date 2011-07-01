@@ -9,14 +9,22 @@ import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.sprite.Sprite;
+import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
+import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
+import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
 import org.anddev.andengine.input.touch.TouchEvent;
+import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
+import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListener {
 	
@@ -25,9 +33,12 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	private int CAMERA_WIDTH = 0;
 	private int CAMERA_HEIGHT = 0;
 	
+	private GameMultiPlayer gameMultiPlayer;
+	private GameSinglePlayer gameSinglePlayer;
 	
-	//private JeraPongGame game;
-	/** ######## GLOBAL ######## **/
+	private String choiceMap;
+	
+/** ######## GLOBAL ######## **/
 	
 	/** ######## MENU ######## **/
 	
@@ -61,12 +72,22 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		
 		CAMERA_HEIGHT = getWindowManager().getDefaultDisplay().getHeight();
 		CAMERA_WIDTH = getWindowManager().getDefaultDisplay().getWidth();
-		
+
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		final EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
-		engineOptions.getTouchOptions().setRunOnUpdateThread(true);
-		
-		return new Engine(engineOptions);
+		final Engine engine = new Engine(engineOptions); 
+
+		try {
+			if(MultiTouch.isSupported(this)) {
+				engine.setTouchController(new MultiTouchController());
+			} else {
+				Toast.makeText(this, "This device does not support multitouch", Toast.LENGTH_LONG).show();
+			}
+		} catch (final MultiTouchException e) {
+			Toast.makeText(this, "This android does not support multitouch", Toast.LENGTH_LONG).show();
+		}
+
+		return engine;
 		
 	}
 
@@ -74,9 +95,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public void onLoadResources() {
 		
 		Log.e("resources menu","loading");
-		
-		//this.textureFont = new Texture(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		//this.font = new Font(this.textureFont, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32, true, Color.BLACK);
 		
 		this.textureBackground = new Texture(1024, 1024, TextureOptions.DEFAULT);
 		this.textureNameGame = new Texture(256, 256, TextureOptions.DEFAULT);
@@ -103,16 +121,14 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.mEngine.getTextureManager().loadTexture(this.textureExitGame);
 		this.mEngine.getTextureManager().loadTexture(this.textureScore);
 		this.mEngine.getTextureManager().loadTexture(this.textureCredits);
-		//this.mEngine.getTextureManager().loadTexture(this.textureFont);
-		//this.mEngine.getFontManager().loadFont(this.font);
-		
+
 		Log.e("resources menu","ok");
 
 	}
 
 	@Override
 	public Scene onLoadScene() {
-		return SceneMenu();
+		return SceneMenu(this);
 	}
 
 	@Override
@@ -120,7 +136,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		// TODO Auto-generated method stub
 	}
 	
-	public Scene SceneMenu(){
+	public Scene SceneMenu(final Activity activity){
 		
 		final Scene scene = new Scene(1);		
 		scene.setBackground(new ColorBackground(1,1,1));//0.09804f, 0.6274f, 0.8784f));
@@ -140,20 +156,31 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		int widthExitGame = ((CAMERA_WIDTH / 2) - (this.textureRegionExitGame.getWidth() / 2));
 		int widthNameGame = ((CAMERA_WIDTH / 2) - (this.textureRegionNamegame.getWidth() / 2));
 		
-		int heightNameGame = ((CAMERA_HEIGHT / 2) - (this.textureRegionNamegame.getHeight() / 2) - 70);
-		int heightSinglePlayer = ((CAMERA_HEIGHT / 2) - (this.textureRegionSinglePlayer.getHeight() / 2));
-		int heightMultiPlayer = ((CAMERA_HEIGHT / 2) - (this.textureRegionMultiPlayer.getHeight() / 2) + 35);
-		int heightScore = ((CAMERA_HEIGHT / 2) - (this.textureRegionScore.getHeight() / 2) + 70);
-		int heightCredits = ((CAMERA_HEIGHT / 2) - (this.textureRegionCredits.getHeight() / 2) + 105);
-		int heightExitGame = ((CAMERA_HEIGHT / 2) - (this.textureRegionExitGame.getHeight() / 2) + 140);
+		int heightNameGame = ((CAMERA_HEIGHT / 2) - (this.textureRegionNamegame.getHeight() / 2) - 120);
+		int heightSinglePlayer = ((CAMERA_HEIGHT / 2) - (this.textureRegionSinglePlayer.getHeight() / 2) - 20);
+		int heightMultiPlayer = ((CAMERA_HEIGHT / 2) - (this.textureRegionMultiPlayer.getHeight() / 2) + 50);
+		int heightScore = ((CAMERA_HEIGHT / 2) - (this.textureRegionScore.getHeight() / 2) + 120);
+		int heightCredits = ((CAMERA_HEIGHT / 2) - (this.textureRegionCredits.getHeight() / 2) + 190);
+		int heightExitGame = ((CAMERA_HEIGHT / 2) - (this.textureRegionExitGame.getHeight() / 2) + 280);
 		
-		//---Name Game---
+		//---Name GameMultiPlayer---
 		this.spriteNameGame = new Sprite(widthNameGame, heightNameGame, this.textureRegionNamegame);
 		scene.getLastChild().attachChild(this.spriteNameGame);
 		
 		//---Single Player---
 		this.spriteSinglePlayer = new Sprite(widthSinglePlayer, heightSinglePlayer, this.textureRegionSinglePlayer){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+
+				Toast.makeText(getBaseContext(), "Loading GameSinglePlayer...", 100).show();
+				
+				//SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
+				//dialog.show();
+				
+				LoadingGameSinglePlayer();
+				
+				Log.e("scene gameSinglePlayer - > MENU", "loading");
+                MenuScreen.this.gameSinglePlayer.GameScene();
+                Log.e("scene gameSinglePlayer - > MENU", "ok");
 				return true;
 			};
 		};
@@ -163,6 +190,14 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		//---MultiPlayer---
 		this.spriteMultiPlayer = new Sprite(widthMultiPlayer, heightMultiPlayer, this.textureRegionMultiPlayer){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				
+				Toast.makeText(getBaseContext(), "Loading GameMultiPlayer...", 100).show();
+				
+				LoadingGameMultiPlayer();
+				
+				Log.e("scene gameMultiPlayer - > MENU", "loading");
+                MenuScreen.this.gameMultiPlayer.GameScene();
+                Log.e("scene gameMultiPlayer - > MENU", "ok");
 				return true;
 			};
 		};
@@ -187,7 +222,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		scene.getLastChild().attachChild(this.spriteCredits);
 		scene.registerTouchArea(this.spriteCredits);
 		
-		//---Exit Game---
+		//---Exit GameMultiPlayer---
 		this.spriteExitGame = new Sprite(widthExitGame, heightExitGame, this.textureRegionExitGame){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 				finish();
@@ -207,5 +242,76 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	public void LoadingGameMultiPlayer(){
+		
+		this.gameMultiPlayer = new GameMultiPlayer(this);
+		
+		this.gameMultiPlayer.setCAMERA_HEIGHT(CAMERA_HEIGHT);
+		this.gameMultiPlayer.setCAMERA_WIDTH(CAMERA_WIDTH);
+		
+		this.gameMultiPlayer.setTextureBackground( new Texture(1024, 1024, TextureOptions.DEFAULT));
+		this.gameMultiPlayer.setTexturePlayer1(new Texture(256,256,TextureOptions.DEFAULT));
+		this.gameMultiPlayer.setTexturePlayer2(new Texture(256,256,TextureOptions.DEFAULT));
+		this.gameMultiPlayer.setTextureBall(new Texture(64,64,TextureOptions.DEFAULT));
+		this.gameMultiPlayer.setTextureScore(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		this.gameMultiPlayer.setTextureVictory(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		
+		//this.game.setTextureRegionBackground( TextureRegionFactory.createFromAsset(this.game.getTextureBackground(), this, "gfx/background.png",0,0));
+		this.gameMultiPlayer.setTextureRegionPlayer1(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer1(), this, "gfx/player.png",0,0));
+		this.gameMultiPlayer.setTextureRegionPlayer2(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer2(), this, "gfx/player.png",0,0));
+		this.gameMultiPlayer.setTextureRegionBall(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBall(), this, "gfx/ball.png",0,0));
+		this.gameMultiPlayer.setFontScore(new Font(this.gameMultiPlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
+		this.gameMultiPlayer.setFontVictory(new Font(this.gameMultiPlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
 
+		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBackground());
+		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer1());
+		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer2());
+		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBall());
+		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureScore());
+		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureVictory());
+		this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontScore());
+		this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontVictory());
+		
+	}
+	
+	public void LoadingGameSinglePlayer(){
+		
+		this.gameSinglePlayer = new GameSinglePlayer(this);
+		
+		this.gameSinglePlayer.setCAMERA_HEIGHT(CAMERA_HEIGHT);
+		this.gameSinglePlayer.setCAMERA_WIDTH(CAMERA_WIDTH);
+		
+		this.gameSinglePlayer.setTextureBackground( new Texture(1024, 1024, TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTexturePlayer1(new Texture(256,256,TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTexturePlayer2(new Texture(256,256,TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTextureBall(new Texture(64,64,TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTextureScore(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		this.gameSinglePlayer.setTextureVictory(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		
+		//this.game.setTextureRegionBackground( TextureRegionFactory.createFromAsset(this.game.getTextureBackground(), this, "gfx/background.png",0,0));
+		this.gameSinglePlayer.setTextureRegionPlayer1(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePlayer1(), this, "gfx/player.png",0,0));
+		this.gameSinglePlayer.setTextureRegionPlayer2(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePlayer2(), this, "gfx/player.png",0,0));
+		this.gameSinglePlayer.setTextureRegionBall(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTextureBall(), this, "gfx/ball.png",0,0));
+		this.gameSinglePlayer.setFontScore(new Font(this.gameSinglePlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
+		this.gameSinglePlayer.setFontVictory(new Font(this.gameSinglePlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
+
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBackground());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePlayer1());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePlayer2());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBall());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureScore());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureVictory());
+		this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontScore());
+		this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontVictory());
+		
+	}
+
+	public String getChoiceMap() {
+		return choiceMap;
+	}
+
+	public void setChoiceMap(String choiceMap) {
+		this.choiceMap = choiceMap;
+	}
 }
