@@ -320,10 +320,10 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 					removeBall = true;
 					final Scene scene = mEngine.getScene();
 					final String textVictory = new String("Player 2 has won the match!");
-					this.pointsPlayer1 = 0;
-					this.pointsPlayer2 = 0;
-					this.scorePlayer1.setText("" + this.pointsPlayer1);
-					this.scorePlayer2.setText("" + this.pointsPlayer2);
+					//this.pointsPlayer1 = 0;
+					//this.pointsPlayer2 = 0;
+					//this.scorePlayer1.setText("" + this.pointsPlayer1);
+					//this.scorePlayer2.setText("" + this.pointsPlayer2);
 					final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
 					text.registerEntityModifier(
 							new SequenceEntityModifier(
@@ -346,10 +346,10 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 					removeBall = true;
 					final Scene scene = mEngine.getScene();
 					final String textVictory = new String("Player 1 has won the match!");
-					this.pointsPlayer1 = 0;
-					this.pointsPlayer2 = 0;
-					this.scorePlayer1.setText("" + this.pointsPlayer1);
-					this.scorePlayer2.setText("" + this.pointsPlayer2);
+					//this.pointsPlayer1 = 0;
+					//this.pointsPlayer2 = 0;
+					//this.scorePlayer1.setText("" + this.pointsPlayer1);
+					//this.scorePlayer2.setText("" + this.pointsPlayer2);
 					final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
 					text.registerEntityModifier(
 							new SequenceEntityModifier(
