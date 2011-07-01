@@ -1,16 +1,24 @@
 package br.com.jera.jerapong;
 
+import javax.microedition.khronos.opengles.GL10;
+
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.anddev.andengine.entity.modifier.AlphaModifier;
+import org.anddev.andengine.entity.modifier.ParallelEntityModifier;
+import org.anddev.andengine.entity.modifier.ScaleModifier;
+import org.anddev.andengine.entity.modifier.SequenceEntityModifier;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
+import org.anddev.andengine.entity.text.Text;
+import org.anddev.andengine.entity.text.TickerText;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
@@ -26,6 +34,7 @@ import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
+import org.anddev.andengine.util.HorizontalAlign;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -54,7 +63,8 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	private Texture texturePlayer1;
 	private Texture texturePlayer2;
 	private Texture textureBall;
-	private Texture texturePlacar;
+	private Texture textureScore;
+	private Texture textureVictory;
 
 
 	//private TextureRegion textureRegionBackground;
@@ -75,11 +85,12 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 	private Sprite spriteBall;
 	private Body bodyBall;
 
-	private Font fontPlacar;
+	private Font fontScore;
+	private Font fontVictory;
 	private int pointsPlayer1 = 0;
 	private int pointsPlayer2 = 0;
-	private ChangeableText placarPlayer1;
-	private ChangeableText placarPlayer2;
+	private ChangeableText scorePlayer1;
+	private ChangeableText scorePlayer2;
 
 	private Body bodyLeft;
 	private Body bodyRight;
@@ -93,6 +104,7 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 
 	final int PLAYER_BORDER_OFFSET = 100;
 	boolean removeBall = false;
+	boolean resetBall = false;
 
 
 	/** ######## GAME ######## **/
@@ -128,20 +140,24 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		this.texturePlayer1 = new Texture(256,256,TextureOptions.DEFAULT);
 		this.texturePlayer2 = new Texture(256,256,TextureOptions.DEFAULT);
 		this.textureBall = new Texture(64,64,TextureOptions.DEFAULT);
-		this.texturePlacar = new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.textureScore = new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.textureVictory = new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 		//this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/background.png",0,0);
 		this.textureRegionPlayer1 = TextureRegionFactory.createFromAsset(this.texturePlayer1, this, "gfx/player.png",0,0);
 		this.textureRegionPlayer2 = TextureRegionFactory.createFromAsset(this.texturePlayer2, this, "gfx/player.png",0,0);
 		this.textureRegionBall = TextureRegionFactory.createFromAsset(this.textureBall, this, "gfx/ball.png",0,0);		
-		this.fontPlacar = new Font(this.texturePlacar, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE);
+		this.fontScore = new Font(this.textureScore, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE);
+		this.fontVictory = new Font(this.textureVictory, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE);
 
 		this.mEngine.getTextureManager().loadTexture(this.textureBackground);
 		this.mEngine.getTextureManager().loadTexture(this.texturePlayer1);
 		this.mEngine.getTextureManager().loadTexture(this.texturePlayer2);
 		this.mEngine.getTextureManager().loadTexture(this.textureBall);
-		this.mEngine.getTextureManager().loadTexture(this.texturePlacar);
-		this.mEngine.getFontManager().loadFont(this.fontPlacar);
+		this.mEngine.getTextureManager().loadTexture(this.textureScore);
+		this.mEngine.getTextureManager().loadTexture(this.textureVictory);
+		this.mEngine.getFontManager().loadFont(this.fontScore);
+		this.mEngine.getFontManager().loadFont(this.fontVictory);
 
 	}
 
@@ -154,12 +170,12 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		this.physicWorld = new PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
 
-		final Shape ground = new Rectangle(0, CAMERA_HEIGHT - 2, CAMERA_WIDTH, 2);
-		final Shape roof = new Rectangle(0, 0, CAMERA_WIDTH, 2);
+		final Shape ground = new Rectangle(0, CAMERA_HEIGHT - 10, CAMERA_WIDTH, 10);
+		final Shape roof = new Rectangle(0, 0, CAMERA_WIDTH, 10);
 		final Shape left = new Rectangle(0, 0, 2, CAMERA_HEIGHT);
 		final Shape right = new Rectangle(CAMERA_WIDTH - 2, 0, 2, CAMERA_HEIGHT);
 
-		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(1000000000f, 1f, 1.5f);
+		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f, 1f, 1.5f);
 		PhysicsFactory.createBoxBody(this.physicWorld, ground, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(this.physicWorld, roof, BodyType.StaticBody, wallFixtureDef);
 		this.bodyLeft = PhysicsFactory.createBoxBody(this.physicWorld, left, BodyType.StaticBody, wallFixtureDef);
@@ -177,11 +193,11 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		//scene.attachChild(background);
 		scene.setBackground(new ColorBackground(0f,0f,0f));
 
-		placarPlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontPlacar,"0","0".length());
-		placarPlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontPlacar,"0","0".length());
+		scorePlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontScore,"0","0".length());
+		scorePlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontScore,"0","0".length());
 
-		scene.getLastChild().attachChild(placarPlayer1);		
-		scene.getLastChild().attachChild(placarPlayer2);
+		scene.getLastChild().attachChild(scorePlayer1);		
+		scene.getLastChild().attachChild(scorePlayer2);
 
 		//Player 1
 		//final int player1PositionX = PLAYER_BORDER_OFFSET;
@@ -299,11 +315,57 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 		Body bodyContact2 = contact.getFixtureB().getBody();
 		if(bodyContact1.equals(bodyBall) || bodyContact2.equals(bodyBall)){
 			if(bodyContact1.equals(bodyLeft) || bodyContact2.equals(bodyLeft)){
-				this.placarPlayer2.setText("" + ++this.pointsPlayer2);
-				removeBall = true;
+				this.scorePlayer2.setText("" + ++this.pointsPlayer2);
+				if(this.pointsPlayer2 >= 7){
+					removeBall = true;
+					final Scene scene = mEngine.getScene();
+					final String textVictory = new String("Player 2 has won the match!");
+					this.pointsPlayer1 = 0;
+					this.pointsPlayer2 = 0;
+					this.scorePlayer1.setText("" + this.pointsPlayer1);
+					this.scorePlayer2.setText("" + this.pointsPlayer2);
+					final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
+					text.registerEntityModifier(
+							new SequenceEntityModifier(
+									new ParallelEntityModifier(
+											new AlphaModifier(2, 0.0f, 1.0f),
+											new ScaleModifier(2, 0.5f, 1.5f)
+									)									
+							)
+					);
+					text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+					scene.getLastChild().attachChild(text);
+				}
+				else{
+					removeBall = true;
+					resetBall = true;
+				}				
 			}else if(bodyContact1.equals(bodyRight) || bodyContact2.equals(bodyRight)){
-				this.placarPlayer1.setText("" + ++this.pointsPlayer1);
-				removeBall = true;
+				this.scorePlayer1.setText("" + ++this.pointsPlayer1);
+				if(this.pointsPlayer1 >= 7){
+					removeBall = true;
+					final Scene scene = mEngine.getScene();
+					final String textVictory = new String("Player 1 has won the match!");
+					this.pointsPlayer1 = 0;
+					this.pointsPlayer2 = 0;
+					this.scorePlayer1.setText("" + this.pointsPlayer1);
+					this.scorePlayer2.setText("" + this.pointsPlayer2);
+					final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
+					text.registerEntityModifier(
+							new SequenceEntityModifier(
+									new ParallelEntityModifier(
+											new AlphaModifier(2, 0.0f, 1.0f),
+											new ScaleModifier(2, 0.5f, 1.5f)
+									)									
+							)
+					);
+					text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+					scene.getLastChild().attachChild(text);
+				}
+				else{
+					removeBall = true;
+					resetBall = true;
+				}
 			}			
 		}		
 		this.runOnUpdateThread(new Runnable() {
@@ -317,11 +379,14 @@ public class JeraPongGame extends BaseGameActivity implements /*IOnSceneTouchLis
 					scene.unregisterTouchArea(spriteBall);
 					scene.getLastChild().detachChild(spriteBall);
 					removeBall = false;
-					spriteBall.setPosition((CAMERA_WIDTH / 2) - (textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (textureRegionBall.getHeight() / 2));
-					bodyBall = PhysicsFactory.createCircleBody(physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
-					scene.getLastChild().attachChild(spriteBall);
-					physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-					bodyBall.setLinearVelocity(50f,10f);
+					if(resetBall){
+						spriteBall.setPosition((CAMERA_WIDTH / 2) - (textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (textureRegionBall.getHeight() / 2));
+						bodyBall = PhysicsFactory.createCircleBody(physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
+						scene.getLastChild().attachChild(spriteBall);
+						physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
+						bodyBall.setLinearVelocity(50f,10f);
+						resetBall = false;
+					}					
 				}
 			}
 		});
