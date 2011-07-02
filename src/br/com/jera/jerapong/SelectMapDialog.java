@@ -1,14 +1,10 @@
 package br.com.jera.jerapong;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.res.Resources;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
