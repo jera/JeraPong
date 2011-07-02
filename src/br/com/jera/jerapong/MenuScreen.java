@@ -38,7 +38,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	
 	private String choiceMap;
 	
-/** ######## GLOBAL ######## **/
+	/** ######## GLOBAL ######## **/
 	
 	/** ######## MENU ######## **/
 	
@@ -173,8 +173,8 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 
 				Toast.makeText(getBaseContext(), "Loading GameSinglePlayer...", 100).show();
 				
-				//SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
-				//dialog.show();
+				SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
+				dialog.show();
 				
 				LoadingGameSinglePlayer();
 				
