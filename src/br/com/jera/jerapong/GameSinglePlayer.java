@@ -25,6 +25,7 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.util.HorizontalAlign;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -33,13 +34,14 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
-public class GameMultiPlaye2 implements /*IOnSceneTouchListener,*/ ContactListener {
+public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListener {
 
 	/** ######## GLOBAL ######## **/
 
 	private int CAMERA_WIDTH = 0;
 	private int CAMERA_HEIGHT = 0;
 	
+	private String choiceMap;
 	private MenuScreen menuScreen;
 	
 	/** ######## GLOBAL ######## **/
@@ -52,7 +54,6 @@ public class GameMultiPlaye2 implements /*IOnSceneTouchListener,*/ ContactListen
 	private Texture textureBall;
 	private Texture textureScore;
 	private Texture textureVictory;
-
 
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionPlayer1;
@@ -92,11 +93,12 @@ public class GameMultiPlaye2 implements /*IOnSceneTouchListener,*/ ContactListen
 	final int PLAYER_BORDER_OFFSET = 100;
 	boolean removeBall = false;
 	boolean resetBall = false;
-	
+
+
 	/** ######## GAME ######## **/
 	
 	
-	public GameMultiPlaye2(MenuScreen menuScreen) {
+	public GameSinglePlayer(MenuScreen menuScreen) {
 		this.menuScreen = menuScreen;
 	}
 	
@@ -129,8 +131,8 @@ public class GameMultiPlaye2 implements /*IOnSceneTouchListener,*/ ContactListen
 		scene.registerUpdateHandler(this.physicWorld);
 
 		//---BackGround---
-		//final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
-		//scene.attachChild(background);
+		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
+		scene.attachChild(background);
 		scene.setBackground(new ColorBackground(0f,0f,0f));
 
 		scorePlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontScore,"0","0".length());
@@ -166,15 +168,9 @@ public class GameMultiPlaye2 implements /*IOnSceneTouchListener,*/ ContactListen
 		this.textureRegionPlayer2.setFlippedHorizontal(true);
 		this.spritePlayer2 = new Sprite(player2PositionX,player2PositionY, this.textureRegionPlayer2){
 			@Override
-			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-				switch(pSceneTouchEvent.getAction()) {					
-				case TouchEvent.ACTION_MOVE:
-					Vector2 newPosition = new Vector2(bodyPlayer2.getPosition().x, pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);						
-					bodyPlayer2.setTransform(newPosition, 0);						
-					break;					
-				}
-				return true;
-			}
+			public void registerUpdateHandler(org.anddev.andengine.engine.handler.IUpdateHandler pUpdateHandler) {
+					Toast.makeText(menuScreen.getBaseContext(), "Loading GameSinglePlayer...", 100).show();
+			};
 		};		
 		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.StaticBody,FIXTURE_PLAYERS);
 		scene.registerTouchArea(spritePlayer2);
@@ -300,6 +296,7 @@ public class GameMultiPlaye2 implements /*IOnSceneTouchListener,*/ ContactListen
 			@Override
 			public void run() {
 				if(refreshVelocity){					
+					Log.e("vel"," " + speedX + " - " + speedY);
 					bodyBall.setLinearVelocity(new Vector2(speedX,speedY));					
 					refreshVelocity = false;
 				}				
@@ -428,6 +425,14 @@ public class GameMultiPlaye2 implements /*IOnSceneTouchListener,*/ ContactListen
 
 	public void setFontVictory(Font fontVictory) {
 		this.fontVictory = fontVictory;
+	}
+
+	public String getChoiceMap() {
+		return choiceMap;
+	}
+
+	public void setChoiceMap(String choiceMap) {
+		this.choiceMap = choiceMap;
 	}
 	
 }

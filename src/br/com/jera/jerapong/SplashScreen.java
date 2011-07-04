@@ -3,14 +3,13 @@ package br.com.jera.jerapong;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.opengl.texture.source.AssetTextureSource;
 import org.anddev.andengine.opengl.texture.source.ITextureSource;
-import org.anddev.andengine.ui.activity.BaseSplashActivity;
 
 import android.app.Activity;
 
-public class SplashScreen extends BaseSplashActivity {
+public class SplashScreen extends BaseSplashPong {
 		
 	private static final int SPLASH_DURATION = 3;
-	//private static final float SPLASH_SCALE_FROM = 1f;
+	private static final float SPLASH_SCALE_FROM = 0.8f;
 
 	@Override
 	protected ScreenOrientation getScreenOrientation() {
@@ -25,6 +24,11 @@ public class SplashScreen extends BaseSplashActivity {
 	@Override
 	protected float getSplashDuration() {
 		return SPLASH_DURATION;
+	}
+	
+	@Override
+	protected float getSplashScaleFrom(){
+		return SPLASH_SCALE_FROM;
 	}
 
 	@Override

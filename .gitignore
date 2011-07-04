@@ -9,7 +9,7 @@
 *.class
 
 # generated GUI files
-*R.java
+R.java
 
 data.properties
 data.cpp

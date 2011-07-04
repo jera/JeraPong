@@ -25,7 +25,6 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.util.HorizontalAlign;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -34,7 +33,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
-public class GameSinglePlayer2 implements /*IOnSceneTouchListener,*/ ContactListener {
+public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListener {
 
 	/** ######## GLOBAL ######## **/
 
@@ -53,6 +52,7 @@ public class GameSinglePlayer2 implements /*IOnSceneTouchListener,*/ ContactList
 	private Texture textureBall;
 	private Texture textureScore;
 	private Texture textureVictory;
+
 
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionPlayer1;
@@ -92,12 +92,11 @@ public class GameSinglePlayer2 implements /*IOnSceneTouchListener,*/ ContactList
 	final int PLAYER_BORDER_OFFSET = 100;
 	boolean removeBall = false;
 	boolean resetBall = false;
-
-
+	
 	/** ######## GAME ######## **/
 	
 	
-	public GameSinglePlayer2(MenuScreen menuScreen) {
+	public GameMultiPlayer(MenuScreen menuScreen) {
 		this.menuScreen = menuScreen;
 	}
 	
@@ -167,9 +166,15 @@ public class GameSinglePlayer2 implements /*IOnSceneTouchListener,*/ ContactList
 		this.textureRegionPlayer2.setFlippedHorizontal(true);
 		this.spritePlayer2 = new Sprite(player2PositionX,player2PositionY, this.textureRegionPlayer2){
 			@Override
-			public void registerUpdateHandler(org.anddev.andengine.engine.handler.IUpdateHandler pUpdateHandler) {
-					Toast.makeText(menuScreen.getBaseContext(), "Loading GameSinglePlayer2...", 100).show();
-			};
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+				switch(pSceneTouchEvent.getAction()) {					
+				case TouchEvent.ACTION_MOVE:
+					Vector2 newPosition = new Vector2(bodyPlayer2.getPosition().x, pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);						
+					bodyPlayer2.setTransform(newPosition, 0);						
+					break;					
+				}
+				return true;
+			}
 		};		
 		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.StaticBody,FIXTURE_PLAYERS);
 		scene.registerTouchArea(spritePlayer2);
@@ -295,7 +300,6 @@ public class GameSinglePlayer2 implements /*IOnSceneTouchListener,*/ ContactList
 			@Override
 			public void run() {
 				if(refreshVelocity){					
-					Log.e("vel"," " + speedX + " - " + speedY);
 					bodyBall.setLinearVelocity(new Vector2(speedX,speedY));					
 					refreshVelocity = false;
 				}				
@@ -425,5 +429,5 @@ public class GameSinglePlayer2 implements /*IOnSceneTouchListener,*/ ContactList
 	public void setFontVictory(Font fontVictory) {
 		this.fontVictory = fontVictory;
 	}
-
+	
 }
