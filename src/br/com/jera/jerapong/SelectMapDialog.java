@@ -34,8 +34,18 @@ public class SelectMapDialog extends Dialog {
 				button.setImageResource(activity.getApplicationContext().getResources().getIdentifier(currentMap + "_thumb", "drawable", "br.com.jera.jerapong"));
 				button.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
-						menu.LoadingGameSinglePlayer(currentMap);
-						menu.gameSinglePlayer.GameScene();
+						if(menu.modeSelected == 1){
+							menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
+							menu.gameRunning = true;
+							menu.LoadingGameSinglePlayer(currentMap);							
+							menu.gameSinglePlayer.GameScene();
+						}
+						else{
+							menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
+							menu.gameRunning = true;
+							menu.LoadingGameMultiPlayer(currentMap);
+							menu.gameMultiPlayer.GameScene();
+						}
 						dismiss();
 					}
 				});
