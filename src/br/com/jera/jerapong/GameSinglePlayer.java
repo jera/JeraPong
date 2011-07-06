@@ -89,8 +89,6 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	private Runnable runBall;
 
-	private Body bodyRight;
-
 	final float MAXIMUM_BALL_SPEED = 40f;
 	final float MINIMUM_BALL_SPEED = 5f;
 	final float WALL_WIDTH = 2;
@@ -106,7 +104,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	float tempo;
 
 	public Sound pingSound;
-
+	Scene scene;
 	private CameraScene pauseGameScene;	
 	public String choiceMap;
 
@@ -123,10 +121,10 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		final int x = CAMERA_WIDTH / 2 - this.textureRegionPause.getWidth() / 2;
 		final int y = CAMERA_HEIGHT / 2 - this.textureRegionPause.getHeight() / 2;
 		final Sprite pausedSprite = new Sprite(x, y, this.textureRegionPause);
-		this.pauseGameScene.getLastChild().attachChild(pausedSprite);
+		this.pauseGameScene.attachChild(pausedSprite);
 		this.pauseGameScene.setBackgroundEnabled(false);
 		
-		final Scene scene = new Scene(2);
+		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
 		
 		this.physicWorld = new PhysicsWorld(new Vector2(0, 0), false);
@@ -139,14 +137,10 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		final Shape right = new Rectangle(CAMERA_WIDTH - 2, 0, 2, CAMERA_HEIGHT);
 
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f,1f, 0f);
-		PhysicsFactory.createBoxBody(this.physicWorld, ground,
-				BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(this.physicWorld, roof,
-				BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(this.physicWorld, left,
-				BodyType.StaticBody, wallFixtureDef);
-		this.bodyRight = PhysicsFactory.createBoxBody(this.physicWorld, right,
-				BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(this.physicWorld, ground,BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(this.physicWorld, roof,BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(this.physicWorld, left,BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(this.physicWorld, right,BodyType.StaticBody, wallFixtureDef);
 
 		scene.getFirstChild().attachChild(ground);
 		scene.getFirstChild().attachChild(roof);
@@ -417,12 +411,12 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void Pause(){
 		if (menuScreen.getEngine().isRunning()) {
 			if(menuScreen.gameRunning){
-				//scene.setChildScene(this.pauseGameScene, false, true, true);
+				scene.setChildScene(this.pauseGameScene, false, true, true);
 				menuScreen.getEngine().stop();
 			}			
 		} else {
 			if(menuScreen.gameRunning){
-				//this.scene.clearChildScene();
+				this.scene.clearChildScene();
 				menuScreen.getEngine().start();				
 			}
 

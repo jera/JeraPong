@@ -10,7 +10,6 @@ import org.anddev.andengine.entity.modifier.SequenceEntityModifier;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.CameraScene;
 import org.anddev.andengine.entity.scene.Scene;
-import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
@@ -19,7 +18,6 @@ import org.anddev.andengine.entity.text.TickerText;
 import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
-import org.anddev.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.Texture;
@@ -99,9 +97,6 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	private ChangeableText scorePlayer1;
 	private ChangeableText scorePlayer2;
 
-	private Body bodyLeft;
-	private Body bodyRight;
-
 	final float MAXIMUM_BALL_SPEED = 40f;
 	final float MINIMUM_BALL_SPEED = 5f;
 	final float WALL_WIDTH = 2;
@@ -115,6 +110,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	boolean removeBall = false;
 	boolean resetBall = false;
 	
+	Scene scene;
 	CameraScene pauseGameScene;
 	public Sound pingSound;
 	
@@ -130,10 +126,10 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		final int x = CAMERA_WIDTH / 2 - this.textureRegionPause.getWidth() / 2;
 		final int y = CAMERA_HEIGHT / 2 - this.textureRegionPause.getHeight() / 2;
 		final Sprite pausedSprite = new Sprite(x, y, this.textureRegionPause);
-		this.pauseGameScene.getLastChild().attachChild(pausedSprite);
+		this.pauseGameScene.attachChild(pausedSprite);
 		this.pauseGameScene.setBackgroundEnabled(false);
 		
-		final Scene scene = new Scene(2);
+		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
 
 		this.physicWorld = new PhysicsWorld(new Vector2(0,0),false);
@@ -148,8 +144,8 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f, 1f, 0f);
 		PhysicsFactory.createBoxBody(this.physicWorld, ground, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(this.physicWorld, roof, BodyType.StaticBody, wallFixtureDef);
-		this.bodyLeft = PhysicsFactory.createBoxBody(this.physicWorld, left, BodyType.StaticBody, wallFixtureDef);
-		this.bodyRight = PhysicsFactory.createBoxBody(this.physicWorld, right, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(this.physicWorld, left, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(this.physicWorld, right, BodyType.StaticBody, wallFixtureDef);
 
 		scene.getFirstChild().attachChild(ground);
 		scene.getFirstChild().attachChild(roof);
@@ -158,15 +154,22 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 
 		scene.registerUpdateHandler(this.physicWorld);
 
-		//---BackGround---
+		/**
+		 * Background
+		 */
 		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
+		float scalaXBG = (float)CAMERA_WIDTH / (float)this.textureRegionBackground.getWidth();
+		float scalaYBG = (float)CAMERA_HEIGHT / (float)this.textureRegionBackground.getHeight();
+		background.setScaleCenter(0f,0f);
+		background.setScaleX(scalaXBG);
+		background.setScaleY(scalaYBG);		
 		scene.attachChild(background);
 
 		scorePlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontScore,"0","0".length());
 		scorePlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontScore,"0","0".length());
 
-		scene.getLastChild().attachChild(scorePlayer1);		
-		scene.getLastChild().attachChild(scorePlayer2);
+		scene.attachChild(scorePlayer1);		
+		scene.attachChild(scorePlayer2);
 		
 		/**
 		 * Bar Right
@@ -175,14 +178,14 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		int positionY = 0;
 		this.spriteBarRight = new Sprite(positionX,positionY,this.textureRegionBarRight);
 		this.bodyBarRight = PhysicsFactory.createBoxBody(this.physicWorld, this.spriteBarRight, BodyType.StaticBody, wallFixtureDef);
-		scene.getLastChild().attachChild(spriteBarRight);
+		scene.attachChild(spriteBarRight);
 		
 		/**
 		 * Bar Left
 		 */
 		this.spriteBarLeft = new Sprite(0,0,this.textureRegionBarLeft);
 		this.bodyBarLeft = PhysicsFactory.createBoxBody(this.physicWorld, this.spriteBarLeft, BodyType.StaticBody, wallFixtureDef);
-		scene.getLastChild().attachChild(spriteBarLeft);
+		scene.attachChild(spriteBarLeft);
 
 		/**
 		 * Player Right (1)
@@ -191,7 +194,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		final int player1PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;
 		this.spritePlayer1 = new Sprite(player1PositionX, player1PositionY, this.textureRegionPlayer1);
 		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld, this.spritePlayer1, BodyType.StaticBody, FIXTURE_PLAYERS);
-		scene.getLastChild().attachChild(spritePlayer1);
+		scene.attachChild(spritePlayer1);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer1, this.bodyPlayer1, true, true));
 		this.shapeTouchPlayer1 = new Rectangle((CAMERA_WIDTH / 2) + 100, 10,CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100), CAMERA_HEIGHT) {
 			@Override
@@ -224,7 +227,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		final int player2PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;
 		this.spritePlayer2 = new Sprite(player2PositionX, player2PositionY, this.textureRegionPlayer2);
 		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld, this.spritePlayer2, BodyType.StaticBody, FIXTURE_PLAYERS);
-		scene.getLastChild().attachChild(spritePlayer2);
+		scene.attachChild(spritePlayer2);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer2, this.bodyPlayer2, true, true));
 		this.shapeTouchPlayer2 = new Rectangle(0,0,CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100),CAMERA_HEIGHT){
 			@Override
@@ -252,16 +255,23 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		 * Middle line
 		 */
 		final Sprite middleLine = new Sprite(CAMERA_WIDTH / 2, 0, this.textureRegionMiddleLine);
-		scene.getLastChild().attachChild(middleLine);		
+		scene.attachChild(middleLine);		
 		
 		/**
 		 * Ball
 		 */
 		this.spriteBall = new Sprite((CAMERA_WIDTH / 2) - (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (this.textureRegionBall.getHeight() / 2), this.textureRegionBall);
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
-		scene.getLastChild().attachChild(spriteBall);
+		scene.attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-		this.bodyBall.setLinearVelocity(5,5);
+//		this.bodyBall.setLinearVelocity(5,10);
+		
+		menuScreen.runOnUpdateThread(new Runnable() {
+			@Override
+			public void run() {		    	 
+				bodyBall.setLinearVelocity(5,17);
+			}
+		});
 		activeBall = true;
 		//this.bodyBall.applyLinearImpulse(new Vector2(20,5),this.bodyBall.getPosition());
 
@@ -277,7 +287,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		Body bodyContact1 = contact.getFixtureA().getBody();
 		Body bodyContact2 = contact.getFixtureB().getBody();
 		if(bodyContact1.equals(bodyBall) || bodyContact2.equals(bodyBall)){
-			if(bodyContact1.equals(bodyLeft) || bodyContact2.equals(bodyLeft)){
+			if(bodyContact1.equals(bodyBarLeft) || bodyContact2.equals(bodyBarLeft)){
 				this.scorePlayer2.setText("" + ++this.pointsPlayer2);
 				
 				if(this.pointsPlayer2 >= 7){
@@ -294,14 +304,14 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 						)
 					);
 					text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-					scene.getLastChild().attachChild(text);
+					scene.attachChild(text);
 				}
 				else{
 					removeBall = true;
 					resetBall = true;
 					playerTime = 1;
 				}				
-			}else if(bodyContact1.equals(bodyRight) || bodyContact2.equals(bodyRight)){
+			}else if(bodyContact1.equals(bodyBarRight) || bodyContact2.equals(bodyBarRight)){
 				this.scorePlayer1.setText("" + ++this.pointsPlayer1);
 				if(this.pointsPlayer1 >= 7){
 					removeBall = true;
@@ -317,7 +327,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 						)
 					);
 					text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-					scene.getLastChild().attachChild(text);
+					scene.attachChild(text);
 				}
 				else{
 					removeBall = true;
@@ -333,6 +343,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				if(removeBall){
 					activeBall = false;
 					bodyBall.setTransform((CAMERA_WIDTH / PTM_RATIO) + 10,(CAMERA_HEIGHT / PTM_RATIO) + 10, 0);
+					bodyBall.setLinearVelocity(0,0);
 					removeBall = false;
 					if(resetBall){
 						bodyBall.setTransform((CAMERA_WIDTH / 2) / PTM_RATIO, (CAMERA_HEIGHT / 2) / PTM_RATIO, 0f);
@@ -445,12 +456,12 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	public void Pause(){
 		if (menuScreen.getEngine().isRunning()) {
 			if(menuScreen.gameRunning){
-				//scene.setChildScene(this.pauseGameScene, false, true, true);
+				scene.setChildScene(this.pauseGameScene, false, true, true);
 				menuScreen.getEngine().stop();
 			}			
 		} else {
 			if(menuScreen.gameRunning){
-				//this.scene.clearChildScene();
+				scene.clearChildScene();
 				menuScreen.getEngine().start();				
 			}
 

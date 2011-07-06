@@ -10,7 +10,6 @@ import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
-import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
@@ -287,7 +286,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.gameMultiPlayer.setCAMERA_HEIGHT(CAMERA_HEIGHT);
 		this.gameMultiPlayer.setCAMERA_WIDTH(CAMERA_WIDTH);
 		
-		this.gameMultiPlayer.setTextureBackground( new Texture(1024, 1024, TextureOptions.DEFAULT));
+		this.gameMultiPlayer.setTextureBackground( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 		this.gameMultiPlayer.setTexturePlayer1(new Texture(128,256,TextureOptions.DEFAULT));
 		this.gameMultiPlayer.setTexturePlayer2(new Texture(128,256,TextureOptions.DEFAULT));
 		this.gameMultiPlayer.setTextureBall(new Texture(128,128,TextureOptions.DEFAULT));
@@ -358,6 +357,9 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		if (pKeyCode == KeyEvent.KEYCODE_MENU && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
 			if(modeSelected == 1){
 				this.gameSinglePlayer.Pause();
+			}
+			else if(modeSelected == 2){
+				this.gameMultiPlayer.Pause();
 			}
 			
 			//if (this.getEngine().isRunning()) {
