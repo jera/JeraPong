@@ -40,6 +40,8 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public GameMultiPlayer gameMultiPlayer;
 	public GameSinglePlayer gameSinglePlayer;	
 	public static String choiceMap;
+	private Score score;
+	private OpenHelper openHelper;
 	
 	/** ######## ENGINE ######## **/
 	
@@ -77,6 +79,9 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	
 	@Override
 	public Engine onLoadEngine() {		
+		
+		openHelper = new OpenHelper(getBaseContext());
+		
 		CAMERA_HEIGHT = getWindowManager().getDefaultDisplay().getHeight();
 		CAMERA_WIDTH = getWindowManager().getDefaultDisplay().getWidth();
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -204,7 +209,14 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		 */
 		this.spriteScore = new Sprite(widthScore, heightScore, this.textureRegionScore){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				return true;
+				
+				MenuScreen.this.score = new Score();
+				
+				MenuScreen.this.score.SaveScore(MenuScreen.this,"player_1 : 70,43|player_2 : 120,30|player_5 : 10,09|player_56 : 40,32|player_33 : 11,67|player_31 : 13,67|player_3 : 45,67|player_36 : 05,67|player_8 : 06,67|player_47 : 57,67");
+				
+				Log.e("Save Score", "OK");
+				
+				return false;
 			};
 		};
 		scene.getLastChild().attachChild(this.spriteScore);
@@ -215,7 +227,10 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		 */
 		this.spriteCredits = new Sprite(widthCredits, heightCredits, this.textureRegionCredits){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				return true;
+
+				
+				
+				return false;
 			};
 		};
 		scene.getLastChild().attachChild(this.spriteCredits);
