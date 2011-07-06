@@ -58,6 +58,12 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private Texture textureBarRight;
 	private Texture textureMiddleLine;
 	private Texture textureBGScore;
+	private Texture textureBackgroundPause;
+	private Texture texturePauseContinue;
+	private Texture texturePauseNewGame;
+	private Texture texturePauseRestart;
+	private Texture texturePauseMainMenu;
+	
 
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionPlayer1;
@@ -66,6 +72,11 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private TextureRegion textureRegionBarRight;
 	private TextureRegion textureRegionMiddleLine;
 	private TextureRegion textureRegionBGScore;
+	private TextureRegion textureRegionBackgroundPause;
+	private TextureRegion textureRegionPauseContinue;
+	private TextureRegion textureRegionPauseNewGame;
+	private TextureRegion textureRegionPauseRestart;
+	private TextureRegion textureRegionPauseMainMenu;
 
 	private PhysicsWorld physicWorld;
 	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory
@@ -117,12 +128,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	}
 	
 	public void GameScene() {
-		this.pauseGameScene = new CameraScene(1, this.menuScreen.camera);
-		final int x = CAMERA_WIDTH / 2 - this.textureRegionPause.getWidth() / 2;
-		final int y = CAMERA_HEIGHT / 2 - this.textureRegionPause.getHeight() / 2;
-		final Sprite pausedSprite = new Sprite(x, y, this.textureRegionPause);
-		this.pauseGameScene.attachChild(pausedSprite);
-		this.pauseGameScene.setBackgroundEnabled(false);
+		CreateGameMenu();
 		
 		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
@@ -377,6 +383,11 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setTextureBarRight(Texture t) { this.textureBarRight = t; }
 	public void setTextureMiddleLine(Texture t) { this.textureMiddleLine = t; }
 	public void setTextureBGScore(Texture t) { this.textureBGScore = t; }
+	public void setTextureBackgroundPause(Texture t) { this.textureBackgroundPause= t; }
+	public void setTexturePauseContinue(Texture t) { this.texturePauseContinue = t; }
+	public void setTexturePauseNewGame(Texture t) { this.texturePauseNewGame = t; }
+	public void setTexturePauseRestart(Texture t) { this.texturePauseRestart = t; }
+	public void setTexturePauseMainMenu(Texture t) { this.texturePauseMainMenu = t; }	
 	public void setTextureRegionBackground(TextureRegion tr) {	this.textureRegionBackground = tr; }
 	public void setTextureRegionPlayer1(TextureRegion tr) { this.textureRegionPlayer1 = tr; }
 	public void setTextureRegionBall(TextureRegion tr) {	this.textureRegionBall = tr; }
@@ -384,6 +395,11 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setTextureRegionBarRight(TextureRegion tr) { this.textureRegionBarRight = tr; }
 	public void setTextureRegionMiddleLine(TextureRegion tr) { this.textureRegionMiddleLine = tr; }
 	public void setTextureRegionBGScore(TextureRegion tr) { this.textureRegionBGScore = tr; }
+	public void setTextureRegionBackgroundPause(TextureRegion tr) { this.textureRegionBackgroundPause = tr; }
+	public void setTextureRegionPauseContinue(TextureRegion tr) { this.textureRegionPauseContinue = tr; }
+	public void setTextureRegionPauseNewGame(TextureRegion tr) { this.textureRegionPauseNewGame = tr; }
+	public void setTextureRegionPauseRestart(TextureRegion tr) { this.textureRegionPauseRestart = tr; }
+	public void setTextureRegionPauseMainMenu(TextureRegion tr) { this.textureRegionPauseMainMenu = tr; }	
 	public void setFontScore(Font fontScore) { this.fontScore = fontScore; }
 	public void setFontVictory(Font fontVictory) { this.fontVictory = fontVictory; }
 	public void setChoiceMap(String choiceMap) { this.choiceMap = choiceMap; }	
@@ -397,6 +413,12 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public Texture getTextureBarRight() { return textureBarRight; }
 	public Texture getTextureMiddleLine() { return textureMiddleLine; }
 	public Texture getTextureBGScore() { return textureBGScore; }
+	public Texture getTextureBackgroundPause() { return textureBackgroundPause; }
+	public Texture getTexturePauseContinue() { return texturePauseContinue; }
+	public Texture getTexturePauseNewGame() { return texturePauseNewGame; }
+	public Texture getTexturePauseRestart() { return texturePauseRestart; }
+	public Texture getTexturePauseMainMenu() { return texturePauseMainMenu; }
+	
 	public TextureRegion getTextureRegionBackground() {	return textureRegionBackground; }	
 	public TextureRegion getTextureRegionPlayer1() { return textureRegionPlayer1; }
 	public TextureRegion getTextureRegionBall() { return textureRegionBall;	}
@@ -404,11 +426,16 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public TextureRegion getTextureRegionBarRight() { return textureRegionBarRight; }
 	public TextureRegion getTextureRegionMiddleLine() { return textureRegionMiddleLine; }
 	public TextureRegion getTextureRegionBGScore() { return textureRegionBGScore; }
+	public TextureRegion getTextureRegionBackgroundPause() { return textureRegionBackgroundPause; }
+	public TextureRegion getTextureRegionPauseContinue() { return textureRegionPauseContinue; }
+	public TextureRegion getTextureRegionPauseNewGame() { return textureRegionPauseNewGame; }
+	public TextureRegion getTextureRegionPauseRestart() { return textureRegionPauseRestart; }
+	public TextureRegion getTextureRegionPauseMainMenu() { return textureRegionPauseMainMenu; }
 	public Font getFontScore() { return fontScore; }	
 	public Font getFontVictory() { return fontVictory; }	
 	public String getChoiceMap() { return choiceMap; }
 	
-	public void Pause(){
+	public void GameMenu(){
 		if (menuScreen.getEngine().isRunning()) {
 			if(menuScreen.gameRunning){
 				scene.setChildScene(this.pauseGameScene, false, true, true);
@@ -422,6 +449,57 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 		}
 		
+	}
+	
+	public void CreateGameMenu(){
+		int posX, posY, hCameraH, hCameraV;
+		this.pauseGameScene = new CameraScene(1, this.menuScreen.camera);
+		/**
+		 * Background
+		 */		
+		final Sprite background = new Sprite(0, 0, this.textureRegionBackgroundPause);
+		float scalaXBG = (float)CAMERA_WIDTH / (float)this.textureRegionBackgroundPause.getWidth();
+		float scalaYBG = (float)CAMERA_HEIGHT / (float)this.textureRegionBackgroundPause.getHeight();
+		background.setScaleCenter(0f,0f);
+		background.setScaleX(scalaXBG);
+		background.setScaleY(scalaYBG);
+		this.pauseGameScene.attachChild(background);
+		
+		/**
+		 * Button Continue
+		 */
+		hCameraH = CAMERA_WIDTH / 2;
+		hCameraV = CAMERA_HEIGHT / 2;
+		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseContinue);
+		posY = hCameraV - this.textureRegionPauseContinue.getHeight() - middleTextureRegionVerticalSizeByTwo(textureRegionPauseContinue);
+		final Sprite buttonPauseContinue = new Sprite(posX,posY,textureRegionPauseContinue);
+		this.pauseGameScene.attachChild(buttonPauseContinue);
+		
+		/**
+		 * Button New Game
+		 */
+		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseNewGame);
+		posY = hCameraV - middleTextureRegionVerticalSizeByTwo(textureRegionPauseNewGame);
+		final Sprite buttonPauseNewGame = new Sprite(posX,posY,textureRegionPauseNewGame);
+		this.pauseGameScene.attachChild(buttonPauseNewGame);
+		
+		/**
+		 * Button Restart
+		 */
+		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseRestart);
+		posY = hCameraV + middleTextureRegionVerticalSizeByTwo(textureRegionPauseRestart);
+		final Sprite buttonPauseRestart = new Sprite(posX,posY,textureRegionPauseRestart);
+		this.pauseGameScene.attachChild(buttonPauseRestart);
+		
+		this.pauseGameScene.setBackgroundEnabled(false);
+	}
+	
+	public int middleTextureRegionHorizontalSizeByTwo(TextureRegion tr){
+		return (tr.getWidth() / 2);
+	}
+	
+	public int middleTextureRegionVerticalSizeByTwo(TextureRegion tr){
+		return (tr.getHeight() / 2);
 	}
 	
 }

@@ -264,6 +264,11 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.gameSinglePlayer.setTextureBarRight(new Texture(128,1024,TextureOptions.DEFAULT));
 		this.gameSinglePlayer.setTextureMiddleLine(new Texture(4,1024,TextureOptions.DEFAULT));
 		this.gameSinglePlayer.setTextureBGScore(new Texture(256,128,TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTextureBackgroundPause( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		this.gameSinglePlayer.setTexturePauseContinue( new Texture(256, 64, TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTexturePauseNewGame( new Texture(256, 64, TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTexturePauseRestart( new Texture(256, 64, TextureOptions.DEFAULT));
+		this.gameSinglePlayer.setTexturePauseMainMenu( new Texture(256, 64, TextureOptions.DEFAULT));
 		
 		this.gameSinglePlayer.setTextureRegionBackground( TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTextureBackground(), this, "gfx/maps/" + currentMap + ".jpg",0,0));
 		this.gameSinglePlayer.setTextureRegionPlayer1(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePlayer1(), this, "gfx/game/racket_right.png",0,0));
@@ -272,6 +277,11 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.gameSinglePlayer.setTextureRegionBarRight(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTextureBarRight(), this, "gfx/game/bar_right.png", 0, 0));
 		this.gameSinglePlayer.setTextureRegionMiddleLine(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTextureMiddleLine(), this, "gfx/game/middle_line.png", 0, 0));
 		this.gameSinglePlayer.setTextureRegionBGScore(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTextureBGScore(), this, "gfx/game/score_bg_sp.png", 0, 0));
+		this.gameSinglePlayer.setTextureRegionBackgroundPause(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTextureBackgroundPause(), this, "gfx/pause/pause_bg.jpg", 0, 0));
+		this.gameSinglePlayer.setTextureRegionPauseContinue(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePauseContinue(), this, "gfx/pause/button_continue.png", 0, 0));
+		this.gameSinglePlayer.setTextureRegionPauseNewGame(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePauseNewGame(), this, "gfx/pause/button_new_game.png", 0, 0));
+		this.gameSinglePlayer.setTextureRegionPauseRestart(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePauseRestart(), this, "gfx/pause/button_restart.png", 0, 0));
+		this.gameSinglePlayer.setTextureRegionPauseMainMenu(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePauseNewGame(), this, "gfx/pause/button_main_menu.png", 0, 0));
 		this.gameSinglePlayer.setFontScore(new Font(this.gameSinglePlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
 		this.gameSinglePlayer.setFontVictory(new Font(this.gameSinglePlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
 
@@ -284,6 +294,11 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBarRight());
 		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureMiddleLine());
 		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBGScore());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBackgroundPause());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePauseContinue());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePauseNewGame());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePauseRestart());
+		this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePauseMainMenu());
 		this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontScore());
 		this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontVictory());
 		
@@ -371,7 +386,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public boolean onKeyDown(final int pKeyCode, final KeyEvent pEvent) {
 		if (pKeyCode == KeyEvent.KEYCODE_MENU && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
 			if(modeSelected == 1){
-				this.gameSinglePlayer.Pause();
+				this.gameSinglePlayer.GameMenu();
 			}
 			else if(modeSelected == 2){
 				this.gameMultiPlayer.Pause();
