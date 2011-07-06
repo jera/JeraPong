@@ -38,9 +38,9 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	private int CAMERA_WIDTH = 0;
 	private int CAMERA_HEIGHT = 0;	
 	public GameMultiPlayer gameMultiPlayer;
-	public GameSinglePlayer gameSinglePlayer;	
+	public GameSinglePlayer gameSinglePlayer;
+	private ScoreScreen scoreScreen;
 	public static String choiceMap;
-	private Score score;
 	private DataHelper dataHelper;
 	
 	/** ######## ENGINE ######## **/
@@ -177,17 +177,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 				SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
 				modeSelected = 1;
 				dialog.show();
-				
-				/*Cursor cursor = dataHelper.select();
-					while(cursor.moveToNext()){
-						int id = cursor.getInt(0);
-						String player = cursor.getString(1);
-						double score = cursor.getDouble(2);
-						Log.e("Value DataBase","Id : " + id);
-						Log.e("Value DataBase","Player : " + player);
-						Log.e("Value DataBase","Score : " + score);
-					}*/
-				
 				return false;
 			};
 		};
@@ -203,6 +192,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 				SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
 				modeSelected = 2;
 				dialog.show();
+
 				return false;
 			};
 		};
@@ -215,12 +205,22 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.spriteOptions = new Sprite(widthOptions, heightOptions, this.textureRegionOptions){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 				
-				MenuScreen.this.score = new Score();
+				Cursor cursor = dataHelper.select();
+				int x = 0;
+				String[] vectorPlayer = new String[5];
+				double[] vectorScore = new double[5];
 				
-				MenuScreen.this.score.SaveScore(MenuScreen.this,"player_1 : 70,43|player_2 : 120,30|player_5 : 10,09|player_56 : 40,32|player_33 : 11,67|player_31 : 13,67|player_3 : 45,67|player_36 : 05,67|player_8 : 06,67|player_47 : 57,67");
+				while(cursor.moveToNext()){
+					String player = cursor.getString(1);
+					double score = cursor.getDouble(2);
+					
+					vectorPlayer[x] = player;
+					vectorScore[x] = score;
+					x++;
+				}
 				
-				Log.e("Save Score", "OK");
-				
+				LoadingScoreScreen();
+				MenuScreen.this.scoreScreen.ScoreScene(vectorPlayer,vectorScore);
 				return false;
 			};
 		};
@@ -378,6 +378,25 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		}
 	}
 	
+	
+	public void LoadingScoreScreen(){		
+		
+		this.scoreScreen = new ScoreScreen(this);
+		
+		this.scoreScreen.setCAMERA_HEIGHT(CAMERA_HEIGHT);
+		this.scoreScreen.setCAMERA_WIDTH(CAMERA_WIDTH);
+		
+		this.scoreScreen.setTextureBackground( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		this.scoreScreen.setTextureFontScore(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		
+		this.scoreScreen.setTextureRegionBackground(TextureRegionFactory.createFromAsset(this.scoreScreen.getTextureBackground(), this, "gfx/score/score_bg.png",0,0));
+		this.scoreScreen.setFontScore(new Font(this.scoreScreen.getTextureFontScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32, true, Color.WHITE));
+
+		this.mEngine.getTextureManager().loadTexture(this.scoreScreen.getTextureBackground());
+		this.mEngine.getTextureManager().loadTexture(this.scoreScreen.getTextureFontScore());
+		this.mEngine.getFontManager().loadFont(this.scoreScreen.getFontScore());
+		
+	}
 	
 
 	public static String getChoiceMap() {

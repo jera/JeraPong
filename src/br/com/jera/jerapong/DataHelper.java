@@ -3,6 +3,7 @@ package br.com.jera.jerapong;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class DataHelper {
 
@@ -24,13 +25,13 @@ public class DataHelper {
 	}
 	
 	public Cursor select() {
-		Cursor cursor = db.rawQuery("SELECT _id,rank_player,rank_score FROM ranking ORDER BY _id DESC LIMIT 10",new String [] {});
+		Cursor cursor = db.rawQuery("SELECT _id,rank_player,rank_score FROM ranking ORDER BY rank_score DESC LIMIT 5",new String [] {});
 		return cursor;
 	}
 	
 	public void insert(String player,String score) {
 		db.beginTransaction();
-		db.execSQL("INSERT INTO ranking VALUES (" + player + "," + Double.parseDouble(score.replace(",", ".")) + ")");
+		db.execSQL("INSERT INTO ranking(rank_player,rank_score) VALUES ('" + player + "'," + Double.parseDouble(score.replace(",", ".")) + ")");
 		db.setTransactionSuccessful();
 		db.endTransaction();
 	}
