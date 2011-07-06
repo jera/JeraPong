@@ -24,7 +24,7 @@ public class DataHelper {
 	}
 	
 	public Cursor select() {
-		Cursor cursor = db.rawQuery("SELECT rank_id,rank_player,rank_score FROM ranking ORDER BY rank_id DESC",new String [] {});
+		Cursor cursor = db.rawQuery("SELECT _id,rank_player,rank_score FROM ranking ORDER BY _id DESC LIMIT 10",new String [] {});
 		return cursor;
 	}
 	
@@ -34,20 +34,12 @@ public class DataHelper {
 		db.setTransactionSuccessful();
 		db.endTransaction();
 	}
-	
-	public void update(int id) {
-		db.beginTransaction();
-		db.execSQL("UPDATE ranking SET rank_id = " + id);
-		db.setTransactionSuccessful();
-		db.endTransaction();
-	}
 
 	public void delete(String button) {
 		db.beginTransaction();
 		db.execSQL("DELETE FROM sounds WHERE fileName = ?");
 		db.setTransactionSuccessful();
 		db.endTransaction();
-
 	}
 
 }

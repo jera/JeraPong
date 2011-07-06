@@ -24,6 +24,7 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.Debug;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -40,7 +41,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public GameSinglePlayer gameSinglePlayer;	
 	public static String choiceMap;
 	private Score score;
-	private OpenHelper openHelper;
+	private DataHelper dataHelper;
 	
 	/** ######## ENGINE ######## **/
 	
@@ -74,9 +75,11 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	/** ######## MENU ######## **/
 	
 	@Override
-	public Engine onLoadEngine() {		
+	public Engine onLoadEngine() {
 		
-		openHelper = new OpenHelper(getBaseContext());
+		Log.e("DATABASE", "OPENHELPER loading");
+		dataHelper = new DataHelper(getBaseContext());
+		Log.e("DATABASE", "OPENHELPER OK");
 		
 		CAMERA_HEIGHT = getWindowManager().getDefaultDisplay().getHeight();
 		CAMERA_WIDTH = getWindowManager().getDefaultDisplay().getWidth();
@@ -134,7 +137,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public void onLoadComplete() {
 	}
 	
-	public Scene SceneMenu(final Activity activity){		
+	public Scene SceneMenu(final Activity activity){
 		final Scene scene = new Scene(1);
 		//scene.setOnSceneTouchListener(this);
 		
@@ -174,6 +177,17 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 				SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
 				modeSelected = 1;
 				dialog.show();
+				
+				/*Cursor cursor = dataHelper.select();
+					while(cursor.moveToNext()){
+						int id = cursor.getInt(0);
+						String player = cursor.getString(1);
+						double score = cursor.getDouble(2);
+						Log.e("Value DataBase","Id : " + id);
+						Log.e("Value DataBase","Player : " + player);
+						Log.e("Value DataBase","Score : " + score);
+					}*/
+				
 				return false;
 			};
 		};
