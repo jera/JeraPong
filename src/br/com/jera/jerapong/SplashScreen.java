@@ -18,7 +18,7 @@ public class SplashScreen extends BaseSplashPong {
 
 	@Override
 	protected ITextureSource onGetSplashTextureSource() {
-		return new AssetTextureSource(this,"gfx/splash_jera.png");
+		return new AssetTextureSource(this,"gfx/splash/splash_jera.png");
 	}
 
 	@Override

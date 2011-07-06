@@ -14,7 +14,6 @@ import org.anddev.andengine.entity.modifier.SequenceEntityModifier;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.CameraScene;
 import org.anddev.andengine.entity.scene.Scene;
-import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
@@ -27,11 +26,9 @@ import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
-import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.HorizontalAlign;
 
 import android.util.Log;
-import android.view.KeyEvent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -58,21 +55,30 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private Texture textureScore;
 	private Texture textureVictory;
 	private Texture texturePause;
+	private Texture textureBarRight;
+	private Texture textureMiddleLine;
+	private Texture textureBGScore;
 
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionPlayer1;
 	private TextureRegion textureRegionBall;
 	private TextureRegion textureRegionPause;
+	private TextureRegion textureRegionBarRight;
+	private TextureRegion textureRegionMiddleLine;
+	private TextureRegion textureRegionBGScore;
 
 	private PhysicsWorld physicWorld;
 	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory
-			.createFixtureDef(10f, 1.2f, 0f);
+			.createFixtureDef(10f, 1f, 0f);
 	private static final FixtureDef FIXTURE_BALL = PhysicsFactory
 			.createFixtureDef(1f, 1f, 0f); // densidade,restituição,frição
 
 	private Sprite spritePlayer1;
 	private Shape shapeTouchPlayer1;
 	private Body bodyPlayer1;
+	
+	private Sprite spriteBarRight;
+	private Body bodyBarRight;
 
 	private Sprite spriteBall;
 	private Body bodyBall;
@@ -101,8 +107,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	public Sound pingSound;
 
-	CameraScene pauseGameScene;	
-	String choiceMap;
+	private CameraScene pauseGameScene;	
+	public String choiceMap;
 
 
 	/** ######## GAME ######## **/
@@ -122,18 +128,17 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		
 		final Scene scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
-
+		
 		this.physicWorld = new PhysicsWorld(new Vector2(0, 0), false);
 		this.physicWorld.setContactListener(this);
 		this.PTM_RATIO = PhysicsConnector.PIXEL_TO_METER_RATIO_DEFAULT;
 
-		final Shape ground = new Rectangle(0, CAMERA_HEIGHT - 10, CAMERA_WIDTH,
-				10);
-		final Shape roof = new Rectangle(0, 0, CAMERA_WIDTH, 10);
+		final Shape ground = new Rectangle(0, CAMERA_HEIGHT, CAMERA_WIDTH,10);
+		final Shape roof = new Rectangle(0, 0, CAMERA_WIDTH, 2);
 		final Shape left = new Rectangle(0, 0, 2, CAMERA_HEIGHT);
 		final Shape right = new Rectangle(CAMERA_WIDTH - 2, 0, 2, CAMERA_HEIGHT);
 
-		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f,1f, 1.5f);
+		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f,1f, 0f);
 		PhysicsFactory.createBoxBody(this.physicWorld, ground,
 				BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(this.physicWorld, roof,
@@ -149,18 +154,31 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		scene.getFirstChild().attachChild(right);
 
 		scene.registerUpdateHandler(this.physicWorld);
-
-		// ---BackGround---
-		// final Sprite background = new Sprite(0, 0,
-		// this.textureRegionBackground);
-		// scene.attachChild(background);
-		scene.setBackground(new ColorBackground(0f, 0f, 0f));
-
-		timePlaying = new ChangeableText((CAMERA_WIDTH / 2) - 50, 30,
-				this.fontScore, "0.0", "00000.0".length());
-
-		scene.getLastChild().attachChild(timePlaying);		
 		
+		/**
+		 * Background
+		 */
+		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
+		float scalaXBG = (float)CAMERA_WIDTH / (float)this.textureRegionBackground.getWidth();
+		float scalaYBG = (float)CAMERA_HEIGHT / (float)this.textureRegionBackground.getHeight();
+		background.setScaleCenter(0f,0f);
+		background.setScaleX(scalaXBG);
+		background.setScaleY(scalaYBG);		
+		scene.attachChild(background);
+		
+		/**
+		 * Background score
+		 */
+		int positionX = 10;
+		int positionY = 20;
+		final Sprite bgScore = new Sprite(positionX,positionY,this.textureRegionBGScore);
+		scene.attachChild(bgScore);
+		
+		/**
+		 * Timer
+		 */
+		timePlaying = new ChangeableText(20, 30,this.fontScore, "0.0", "00000.0".length());
+		scene.attachChild(timePlaying);
 		scene.registerUpdateHandler(new TimerHandler(0.1f, true,
 				new ITimerCallback() {
 					@Override
@@ -174,24 +192,26 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 						timePlaying.setText(tp.format(GameSinglePlayer.this.tempo) + " s");
 					}
 				}));
-
-		// --Player 1--
-		final int player1PositionX = CAMERA_WIDTH
-				- textureRegionPlayer1.getWidth() - 50;
-		final int player1PositionY = (CAMERA_HEIGHT / 2)
-				- this.textureRegionPlayer1.getHeight() / 2;
-		// this.textureRegionPlayer2.setFlippedHorizontal(true);
-		this.spritePlayer1 = new Sprite(player1PositionX, player1PositionY,
-				this.textureRegionPlayer1);
-		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,
-				this.spritePlayer1, BodyType.StaticBody, FIXTURE_PLAYERS);
-		scene.getLastChild().attachChild(spritePlayer1);
-		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(
-				this.spritePlayer1, this.bodyPlayer1, true, true));
-		this.bodyPlayer1.setFixedRotation(true);
-
-		this.shapeTouchPlayer1 = new Rectangle((CAMERA_WIDTH / 2) + 100, 10,
-				CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100), CAMERA_HEIGHT) {
+		
+		/**
+		 * Bar Right
+		 */
+		positionX = CAMERA_WIDTH - textureRegionBarRight.getWidth();
+		positionY = 0;
+		this.spriteBarRight = new Sprite(positionX,positionY,this.textureRegionBarRight);
+		this.bodyBarRight = PhysicsFactory.createBoxBody(this.physicWorld, this.spriteBarRight, BodyType.StaticBody, FIXTURE_PLAYERS);
+		scene.attachChild(spriteBarRight);
+		
+		/**
+		 * Player1
+		 */
+		final int player1PositionX = CAMERA_WIDTH - textureRegionPlayer1.getWidth();
+		final int player1PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;
+		this.spritePlayer1 = new Sprite(player1PositionX, player1PositionY, this.textureRegionPlayer1);
+		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld, this.spritePlayer1, BodyType.StaticBody, FIXTURE_PLAYERS);
+		scene.attachChild(spritePlayer1);
+		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer1, this.bodyPlayer1, true, true));
+		this.shapeTouchPlayer1 = new Rectangle((CAMERA_WIDTH / 2) + 100, 10,CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100), CAMERA_HEIGHT) {
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
 					final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -214,26 +234,28 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 			}
 		};
 		scene.registerTouchArea(shapeTouchPlayer1);
-
-		// ---Ball---
-		this.spriteBall = new Sprite((CAMERA_WIDTH / 2)
-				- (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2)
-				- (this.textureRegionBall.getHeight() / 2),
-				this.textureRegionBall);
-		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,
-				spriteBall, BodyType.DynamicBody, FIXTURE_BALL);
-		scene.getLastChild().attachChild(spriteBall);
-		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(
-				spriteBall, bodyBall, true, true));
-		this.bodyBall.setLinearVelocity(5, 0);
-		activeBall = true;
-		// this.bodyBall.applyLinearImpulse(new
-		// Vector2(20,5),this.bodyBall.getPosition());
-
-		scene.setTouchAreaBindingEnabled(true);
-
-		menuScreen.getEngine().setScene(scene);
 		
+		/**
+		 * Middle line
+		 */
+		final Sprite middleLine = new Sprite(CAMERA_WIDTH / 2, 0, this.textureRegionMiddleLine);
+		scene.attachChild(middleLine);
+		
+		/**
+		 * Ball
+		 */
+		this.spriteBall = new Sprite((CAMERA_WIDTH / 2)	- (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - 
+				(this.textureRegionBall.getHeight() / 2),this.textureRegionBall);
+		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall, BodyType.DynamicBody, FIXTURE_BALL);
+		scene.attachChild(spriteBall);
+		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
+		this.bodyBall.setLinearVelocity(5, 5);
+		activeBall = true;
+		
+		
+		
+		scene.setTouchAreaBindingEnabled(true);
+		menuScreen.getEngine().setScene(scene);
 		Log.e("scene game", "OK");
 	}
 
@@ -242,7 +264,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		Body bodyContact1 = contact.getFixtureA().getBody();
 		Body bodyContact2 = contact.getFixtureB().getBody();
 		if (bodyContact1.equals(bodyBall) || bodyContact2.equals(bodyBall)) {
-			if (bodyContact1.equals(bodyRight) || bodyContact2.equals(bodyRight)) {
+			if (bodyContact1.equals(bodyBarRight) || bodyContact2.equals(bodyBarRight)) {
 				
 				removeBall = true;
 				timePlaying.setVisible(false);
@@ -264,7 +286,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 					)
 				);
 				text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-				scene.getLastChild().attachChild(text);				
+				scene.attachChild(text);				
 			}
 			else{
 				pingSound.play();
@@ -284,6 +306,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 						bodyBall.setTransform((CAMERA_WIDTH / PTM_RATIO) + 10,
 								(CAMERA_HEIGHT / PTM_RATIO) + 10, 0);
 						removeBall = false;
+						bodyBall.setLinearVelocity(0f,0f);
 						if (resetBall) {
 							bodyBall.setTransform((CAMERA_WIDTH / 2)
 									/ PTM_RATIO, (CAMERA_HEIGHT / 2)
@@ -351,16 +374,22 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setCAMERA_WIDTH(int cAMERA_WIDTH) { CAMERA_WIDTH = cAMERA_WIDTH;}	
 	public void setCAMERA_HEIGHT(int cAMERA_HEIGHT) { CAMERA_HEIGHT = cAMERA_HEIGHT; }
 	
-	public void setTextureBackground(Texture textureBackground) { this.textureBackground = textureBackground; }
-	public void setTexturePlayer1(Texture texturePlayer1) {	this.texturePlayer1 = texturePlayer1; }
-	public void setTextureBall(Texture textureBall) { this.textureBall = textureBall; }
-	public void setTextureScore(Texture textureScore) { this.textureScore = textureScore; }
-	public void setTextureVictory(Texture textureVictory) {	this.textureVictory = textureVictory; }
-	public void setTexturePause(Texture texturePause) { this.texturePause = texturePause; }
-	public void setTextureRegionBackground(TextureRegion textureRegionBackground) {	this.textureRegionBackground = textureRegionBackground; }
-	public void setTextureRegionPlayer1(TextureRegion textureRegionPlayer1) { this.textureRegionPlayer1 = textureRegionPlayer1; }
-	public void setTextureRegionBall(TextureRegion textureRegionBall) {	this.textureRegionBall = textureRegionBall;	}
-	public void setTextureRegionPause(TextureRegion textureRegionPause) { this.textureRegionPause = textureRegionPause;}
+	public void setTextureBackground(Texture t) { this.textureBackground = t; }
+	public void setTexturePlayer1(Texture t) {	this.texturePlayer1 = t; }
+	public void setTextureBall(Texture t) { this.textureBall = t; }
+	public void setTextureScore(Texture t) { this.textureScore = t; }
+	public void setTextureVictory(Texture t) {	this.textureVictory = t; }
+	public void setTexturePause(Texture t) { this.texturePause = t; }
+	public void setTextureBarRight(Texture t) { this.textureBarRight = t; }
+	public void setTextureMiddleLine(Texture t) { this.textureMiddleLine = t; }
+	public void setTextureBGScore(Texture t) { this.textureBGScore = t; }
+	public void setTextureRegionBackground(TextureRegion tr) {	this.textureRegionBackground = tr; }
+	public void setTextureRegionPlayer1(TextureRegion tr) { this.textureRegionPlayer1 = tr; }
+	public void setTextureRegionBall(TextureRegion tr) {	this.textureRegionBall = tr; }
+	public void setTextureRegionPause(TextureRegion tr) { this.textureRegionPause = tr;}
+	public void setTextureRegionBarRight(TextureRegion tr) { this.textureRegionBarRight = tr; }
+	public void setTextureRegionMiddleLine(TextureRegion tr) { this.textureRegionMiddleLine = tr; }
+	public void setTextureRegionBGScore(TextureRegion tr) { this.textureRegionBGScore = tr; }
 	public void setFontScore(Font fontScore) { this.fontScore = fontScore; }
 	public void setFontVictory(Font fontVictory) { this.fontVictory = fontVictory; }
 	public void setChoiceMap(String choiceMap) { this.choiceMap = choiceMap; }	
@@ -371,10 +400,16 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public Texture getTextureScore() { return textureScore; }	
 	public Texture getTextureVictory() { return textureVictory; }
 	public Texture getTexturePause() { return texturePause; }
+	public Texture getTextureBarRight() { return textureBarRight; }
+	public Texture getTextureMiddleLine() { return textureMiddleLine; }
+	public Texture getTextureBGScore() { return textureBGScore; }
 	public TextureRegion getTextureRegionBackground() {	return textureRegionBackground; }	
-	public TextureRegion getTextureRegionPlayer1() { return textureRegionPlayer1; }	
+	public TextureRegion getTextureRegionPlayer1() { return textureRegionPlayer1; }
 	public TextureRegion getTextureRegionBall() { return textureRegionBall;	}
 	public TextureRegion getTextureRegionPause() { return textureRegionPause; }
+	public TextureRegion getTextureRegionBarRight() { return textureRegionBarRight; }
+	public TextureRegion getTextureRegionMiddleLine() { return textureRegionMiddleLine; }
+	public TextureRegion getTextureRegionBGScore() { return textureRegionBGScore; }
 	public Font getFontScore() { return fontScore; }	
 	public Font getFontVictory() { return fontVictory; }	
 	public String getChoiceMap() { return choiceMap; }

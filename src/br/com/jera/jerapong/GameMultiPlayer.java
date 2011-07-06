@@ -56,12 +56,20 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	private Texture textureScore;
 	private Texture textureVictory;
 	private Texture texturePause;
+	private Texture textureBarRight;
+	private Texture textureBarLeft;
+	private Texture textureMiddleLine;
+	private Texture textureBGScore;
 
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionPlayer1;
 	private TextureRegion textureRegionPlayer2;
 	private TextureRegion textureRegionBall;
 	private TextureRegion textureRegionPause;
+	private TextureRegion textureRegionBarRight;
+	private TextureRegion textureRegionBarLeft;
+	private TextureRegion textureRegionMiddleLine;
+	private TextureRegion textureRegionBGScore;
 
 	private PhysicsWorld physicWorld;
 	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.2f, 0f);
@@ -74,6 +82,12 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	private Sprite spritePlayer2;
 	private Shape shapeTouchPlayer2;
 	private Body bodyPlayer2;
+	
+	private Sprite spriteBarRight;
+	private Body bodyBarRight;
+	
+	private Sprite spriteBarLeft;
+	private Body bodyBarLeft;
 
 	private Sprite spriteBall;
 	private Body bodyBall;
@@ -131,7 +145,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		final Shape left = new Rectangle(0, 0, 2, CAMERA_HEIGHT);
 		final Shape right = new Rectangle(CAMERA_WIDTH - 2, 0, 2, CAMERA_HEIGHT);
 
-		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f, 1f, 1.5f);
+		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f, 1f, 0f);
 		PhysicsFactory.createBoxBody(this.physicWorld, ground, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(this.physicWorld, roof, BodyType.StaticBody, wallFixtureDef);
 		this.bodyLeft = PhysicsFactory.createBoxBody(this.physicWorld, left, BodyType.StaticBody, wallFixtureDef);
@@ -145,40 +159,57 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		scene.registerUpdateHandler(this.physicWorld);
 
 		//---BackGround---
-		//final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
-		//scene.attachChild(background);
-		scene.setBackground(new ColorBackground(0f,0f,0f));
+		final Sprite background = new Sprite(0, 0, this.textureRegionBackground);
+		scene.attachChild(background);
 
 		scorePlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontScore,"0","0".length());
 		scorePlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontScore,"0","0".length());
 
 		scene.getLastChild().attachChild(scorePlayer1);		
 		scene.getLastChild().attachChild(scorePlayer2);
+		
+		/**
+		 * Bar Right
+		 */
+		int positionX = CAMERA_WIDTH - textureRegionBarRight.getWidth();
+		int positionY = 0;
+		this.spriteBarRight = new Sprite(positionX,positionY,this.textureRegionBarRight);
+		this.bodyBarRight = PhysicsFactory.createBoxBody(this.physicWorld, this.spriteBarRight, BodyType.StaticBody, wallFixtureDef);
+		scene.getLastChild().attachChild(spriteBarRight);
+		
+		/**
+		 * Bar Left
+		 */
+		this.spriteBarLeft = new Sprite(0,0,this.textureRegionBarLeft);
+		this.bodyBarLeft = PhysicsFactory.createBoxBody(this.physicWorld, this.spriteBarLeft, BodyType.StaticBody, wallFixtureDef);
+		scene.getLastChild().attachChild(spriteBarLeft);
 
-
-		//final int player1PositionX = PLAYER_BORDER_OFFSET;
-		final int player1PositionX = 50;
-		final int player1PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;				
-		this.spritePlayer1 = new Sprite(player1PositionX,player1PositionY, this.textureRegionPlayer1);		
-		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer1,BodyType.StaticBody,FIXTURE_PLAYERS);		
-		scene.getLastChild().attachChild(spritePlayer1);		
+		/**
+		 * Player Right (1)
+		 */
+		final int player1PositionX = CAMERA_WIDTH - textureRegionPlayer1.getWidth();
+		final int player1PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;
+		this.spritePlayer1 = new Sprite(player1PositionX, player1PositionY, this.textureRegionPlayer1);
+		this.bodyPlayer1 = PhysicsFactory.createBoxBody(this.physicWorld, this.spritePlayer1, BodyType.StaticBody, FIXTURE_PLAYERS);
+		scene.getLastChild().attachChild(spritePlayer1);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer1, this.bodyPlayer1, true, true));
-		this.bodyPlayer1.setFixedRotation(true);
-		
-		
-		//this.shapeTouchPlayer1 = new Rectangle((CAMERA_WIDTH / 2) + 100, 0, CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100),CAMERA_HEIGHT - 20){
-		this.shapeTouchPlayer1 = new Rectangle(0,0,CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100),CAMERA_HEIGHT){
+		this.shapeTouchPlayer1 = new Rectangle((CAMERA_WIDTH / 2) + 100, 10,CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100), CAMERA_HEIGHT) {
 			@Override
-			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
+					final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				float touchY = pSceneTouchEvent.getY();
 				final float minimumPosY = (spritePlayer1.getHeight() / 2) + 10;
-				final float maximumPosY = CAMERA_HEIGHT - (spritePlayer1.getHeight() / 2) - 10;
-				switch(pSceneTouchEvent.getAction()) {
-					case TouchEvent.ACTION_MOVE:
-						if(touchY < minimumPosY) touchY = minimumPosY;
-						if(touchY > maximumPosY) touchY = maximumPosY;
-						Vector2 newPosition = new Vector2(bodyPlayer1.getPosition().x, touchY / PTM_RATIO);
-						bodyPlayer1.setTransform(newPosition, 0);
+				final float maximumPosY = CAMERA_HEIGHT
+						- (spritePlayer1.getHeight() / 2) - 10;
+				switch (pSceneTouchEvent.getAction()) {
+				case TouchEvent.ACTION_MOVE:
+					if (touchY < minimumPosY)
+						touchY = minimumPosY;
+					if (touchY > maximumPosY)
+						touchY = maximumPosY;
+					Vector2 newPosition = new Vector2(
+							bodyPlayer1.getPosition().x, touchY / PTM_RATIO);
+					bodyPlayer1.setTransform(newPosition, 0);
 					break;
 				}
 				return true;
@@ -186,22 +217,21 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		};
 		scene.registerTouchArea(shapeTouchPlayer1);
 
-		//--Player 2--
-		final int player2PositionX = CAMERA_WIDTH - textureRegionPlayer2.getWidth() - 50;
-		final int player2PositionY =  (CAMERA_HEIGHT / 2) - this.textureRegionPlayer2.getHeight() / 2;
-		//this.textureRegionPlayer2.setFlippedHorizontal(true);
-		this.spritePlayer2 = new Sprite(player2PositionX,player2PositionY, this.textureRegionPlayer2);
-		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld,this.spritePlayer2,BodyType.StaticBody,FIXTURE_PLAYERS);
+		/**
+		 * Player Left (2)
+		 */
+		final int player2PositionX = 0;
+		final int player2PositionY = (CAMERA_HEIGHT / 2) - this.textureRegionPlayer1.getHeight() / 2;
+		this.spritePlayer2 = new Sprite(player2PositionX, player2PositionY, this.textureRegionPlayer2);
+		this.bodyPlayer2 = PhysicsFactory.createBoxBody(this.physicWorld, this.spritePlayer2, BodyType.StaticBody, FIXTURE_PLAYERS);
 		scene.getLastChild().attachChild(spritePlayer2);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(this.spritePlayer2, this.bodyPlayer2, true, true));
-		this.bodyPlayer2.setFixedRotation(true);
-		
-		this.shapeTouchPlayer2 = new Rectangle((CAMERA_WIDTH / 2) + 100, 10, CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100),CAMERA_HEIGHT){
+		this.shapeTouchPlayer2 = new Rectangle(0,0,CAMERA_WIDTH - ((CAMERA_WIDTH / 2) + 100),CAMERA_HEIGHT){
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				float touchY = pSceneTouchEvent.getY();
 				final float minimumPosY = (spritePlayer2.getHeight() / 2) + 10;
-				final float maximumPosY = CAMERA_HEIGHT - (spritePlayer2.getHeight() / 2) - 10;  
+				final float maximumPosY = CAMERA_HEIGHT - (spritePlayer2.getHeight() / 2) - 10;
 				switch(pSceneTouchEvent.getAction()) {
 					case TouchEvent.ACTION_MOVE:
 						if(touchY < minimumPosY) touchY = minimumPosY;
@@ -215,12 +245,23 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		};
 		scene.registerTouchArea(shapeTouchPlayer2);
 		
-		//---Ball---
+		/**
+		 * Middle line
+		 */
+		/**
+		 * Middle line
+		 */
+		final Sprite middleLine = new Sprite(CAMERA_WIDTH / 2, 0, this.textureRegionMiddleLine);
+		scene.getLastChild().attachChild(middleLine);		
+		
+		/**
+		 * Ball
+		 */
 		this.spriteBall = new Sprite((CAMERA_WIDTH / 2) - (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (this.textureRegionBall.getHeight() / 2), this.textureRegionBall);
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
 		scene.getLastChild().attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-		this.bodyBall.setLinearVelocity(5,0);
+		this.bodyBall.setLinearVelocity(5,5);
 		activeBall = true;
 		//this.bodyBall.applyLinearImpulse(new Vector2(20,5),this.bodyBall.getPosition());
 
@@ -313,22 +354,21 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 
 	@Override
 	public void endContact(Contact contact) {
-		//Limita velocidades: 4 < vel < 50		 
-		Vector2 speedBall = bodyBall.getLinearVelocity();		
+		//Limita velocidades: 4 < vel < 50
+		Vector2 speedBall = bodyBall.getLinearVelocity();
 		if(speedBall.len() > MAXIMUM_BALL_SPEED){
 			speedX = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.x;
 			speedY = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.y;
-			refreshVelocity = true;			
+			refreshVelocity = true;
 		}
 		if(Math.abs(speedBall.x) < MINIMUM_BALL_SPEED){
 			if(speedBall.x < 0){
-				speedX = speedBall.x - MINIMUM_BALL_SPEED;				
+				speedX = speedBall.x - MINIMUM_BALL_SPEED;
 			}else{
 				speedX = speedBall.x + MINIMUM_BALL_SPEED;
 			}
 			speedY = speedBall.y;
 			refreshVelocity = true;
-			
 		}
 		menuScreen.runOnUpdateThread(new Runnable() {
 			@Override
@@ -364,25 +404,41 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	public Texture getTextureScore() { return textureScore;	}
 	public Texture getTextureVictory() { return textureVictory;	}
 	public Texture getTexturePause() { return texturePause; }
+	public Texture getTextureBarRight() { return textureBarRight; }
+	public Texture getTextureBarLeft() { return textureBarLeft; }
+	public Texture getTextureMiddleLine() { return textureMiddleLine; }
+	public Texture getTextureBGScore() { return textureBGScore; }
 	public TextureRegion getTextureRegionBackground() {	return textureRegionBackground; }
 	public TextureRegion getTextureRegionPlayer1() { return textureRegionPlayer1; }
 	public TextureRegion getTextureRegionPlayer2() { return textureRegionPlayer2; }
 	public TextureRegion getTextureRegionBall() { return textureRegionBall; }
 	public TextureRegion getTextureRegionPause() { return textureRegionPause; }
+	public TextureRegion getTextureRegionBarRight() { return textureRegionBarRight; }
+	public TextureRegion getTextureRegionBarLeft() { return textureRegionBarLeft; }
+	public TextureRegion getTextureRegionMiddleLine() { return textureRegionMiddleLine; }
+	public TextureRegion getTextureRegionBGScore() { return textureRegionBGScore; }
 	public Font getFontVictory() { return fontVictory; }
 	public Font getFontScore() { return fontScore; }
 	public void setTexturePlayer1(Texture texturePlayer1) { this.texturePlayer1 = texturePlayer1; }
-	public void setTextureBackground(Texture textureBackground) { this.textureBackground = textureBackground; }
-	public void setTexturePlayer2(Texture texturePlayer2) { this.texturePlayer2 = texturePlayer2; }	
+	public void setTexturePlayer2(Texture texturePlayer2) { this.texturePlayer2 = texturePlayer2; }
+	public void setTextureBackground(Texture textureBackground) { this.textureBackground = textureBackground; }		
 	public void setTextureBall(Texture textureBall) { this.textureBall = textureBall; }	
 	public void setTextureScore(Texture textureScore) { this.textureScore = textureScore; }	
 	public void setTextureVictory(Texture textureVictory) {	this.textureVictory = textureVictory; }
 	public void setTexturePause(Texture texturePause) {	this.texturePause = texturePause; }
+	public void setTextureBarRight(Texture t) { this.textureBarRight = t; }
+	public void setTextureBarLeft(Texture t) { this.textureBarLeft = t; }
+	public void setTextureMiddleLine(Texture t) { this.textureMiddleLine = t; }
+	public void setTextureBGScore(Texture t) { this.textureBGScore = t; }
 	public void setTextureRegionBackground(TextureRegion textureRegionBackground) { this.textureRegionBackground = textureRegionBackground; }	
 	public void setTextureRegionPlayer1(TextureRegion textureRegionPlayer1) { this.textureRegionPlayer1 = textureRegionPlayer1; }	
 	public void setTextureRegionPlayer2(TextureRegion textureRegionPlayer2) { this.textureRegionPlayer2 = textureRegionPlayer2;	}	
 	public void setTextureRegionBall(TextureRegion textureRegionBall) {	this.textureRegionBall = textureRegionBall; }	
 	public void setTextureRegionPause(TextureRegion textureRegionPause) {	this.textureRegionPause = textureRegionPause; }
+	public void setTextureRegionBarRight(TextureRegion tr) { this.textureRegionBarRight = tr; }
+	public void setTextureRegionBarLeft(TextureRegion tr) { this.textureRegionBarLeft = tr; }
+	public void setTextureRegionMiddleLine(TextureRegion tr) { this.textureRegionMiddleLine = tr; }
+	public void setTextureRegionBGScore(TextureRegion tr) { this.textureRegionBGScore = tr; }
 	public void setFontScore(Font fontScore) { this.fontScore = fontScore; }	
 	public void setFontVictory(Font fontVictory) { this.fontVictory = fontVictory; }
 	
