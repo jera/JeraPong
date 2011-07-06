@@ -149,8 +149,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		background.setScaleY(scalaYBG);		
 		scene.attachChild(background);
 		
-		
-		
 		/**
 		 * Loading menu resources
 		 */
