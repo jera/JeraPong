@@ -24,11 +24,16 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.Debug;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View.OnCreateContextMenuListener;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListener {
@@ -232,8 +237,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		 */
 		this.spriteSound = new Sprite(widthSound, heightSound, this.textureRegionSound){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-
-				
 				
 				return false;
 			};
@@ -436,6 +439,19 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		} else {
 			return super.onKeyDown(pKeyCode, pEvent);
 		}
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id){
+	    Dialog dialog;
+	    switch(id) {
+	    case GameSinglePlayer.SUBMIT_DIALOG:
+	        dialog = new DialogNamePlayer(this,this.gameSinglePlayer.getPlayerScore());
+	        break;
+	    default:
+	        dialog = null;
+	    }
+	    return dialog;
 	}
 	
 }
