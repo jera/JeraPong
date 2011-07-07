@@ -1,6 +1,10 @@
 package br.com.jera.jerapong;
 
+import java.text.NumberFormat;
+
 import org.anddev.andengine.audio.sound.Sound;
+import org.anddev.andengine.engine.handler.timer.ITimerCallback;
+import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.CameraScene;
 import org.anddev.andengine.entity.scene.Scene;
@@ -85,14 +89,15 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	private Body bodyPlayer2;
 	
 	private Sprite spriteBarRight;
-	private Body bodyBarRight;
-	
+	private Body bodyBarRight;	
 	
 	private Sprite spriteBarLeft;
 	private Body bodyBarLeft;
 
 	private Sprite spriteBall;
 	private Body bodyBall;
+	
+	Sprite buttonNewGame;
 
 	private Font fontScore;
 	private Font fontVictory;
@@ -116,6 +121,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	
 	Scene scene;
 	CameraScene pauseGameScene;
+	CameraScene endGameScene;
 	public Sound pingSound;
 	
 	/** ######## GAME ######## **/
@@ -290,8 +296,10 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				this.scorePlayer2.setText("" + ++this.pointsPlayer2);
 				Log.e("player2","touch");
 				if(this.pointsPlayer2 >= 7){
+					menuScreen.gameRunning = false;
 					removeBall = true;
-					PlayerVictory(2);
+					CreateEndGameMenu(2);
+					scene.setChildScene(this.endGameScene, false, true, true);
 					/*final Scene scene = menuScreen.getEngine().getScene();
 					final String textVictory = new String("Player 2 has won the match!");
 					final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
@@ -315,8 +323,10 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				this.scorePlayer1.setText("" + ++this.pointsPlayer1);
 				Log.e("player1","touch");
 				if(this.pointsPlayer1 >= 7){
-					removeBall = true;
-					PlayerVictory(1);
+					menuScreen.gameRunning = false;
+					removeBall = true;					
+					CreateEndGameMenu(1);
+					scene.setChildScene(this.endGameScene, false, true, true);
 					/*final Scene scene = menuScreen.getEngine().getScene();
 					final String textVictory = new String("Player 1 has won the match!");
 					final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
@@ -487,9 +497,18 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		}
 	}
 
+	public int middleTextureRegionHorizontalSizeByTwo(TextureRegion tr){
+		return (tr.getWidth() / 2);
+	}
+
+	public int middleTextureRegionVerticalSizeByTwo(TextureRegion tr){
+		return (tr.getHeight() / 2);
+	}
+	
 	public void CreateGameMenu(){
 		int posX, posY, hCameraH, hCameraV;
 		this.pauseGameScene = new CameraScene(1, this.menuScreen.camera);
+		
 		/**
 		 * Background
 		 */		
@@ -562,19 +581,13 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		this.pauseGameScene.setBackgroundEnabled(false);
 		this.pauseGameScene.setTouchAreaBindingEnabled(true);
 	}
-	
-	public int middleTextureRegionHorizontalSizeByTwo(TextureRegion tr){
-		return (tr.getWidth() / 2);
-	}
 
-	public int middleTextureRegionVerticalSizeByTwo(TextureRegion tr){
-		return (tr.getHeight() / 2);
-	}
-
-	public void PlayerVictory(int player){
+	public void CreateEndGameMenu(int winner){
 		int posXWin, posYWin, posXLoose, posYLoose, posTemp;
 		int hCameraH = CAMERA_WIDTH / 2;
 		int hCameraV = CAMERA_HEIGHT / 2;
+		
+		this.endGameScene = new CameraScene(1, this.menuScreen.camera);		
 		
 		//Positions if player1 win
 		posXLoose = hCameraH + 40;
@@ -583,7 +596,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		posYWin = hCameraV - middleTextureRegionVerticalSizeByTwo(textureRegionWin);
 		
 		//Positions if player2 win
-		if(player == 2){
+		if(winner == 2){
 			posTemp = posXWin;
 			posXWin = posXLoose;
 			posXLoose = posTemp;
@@ -597,7 +610,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		final Sprite spriteLoose = new Sprite(posXLoose,posYLoose,textureRegionLoose);
 		
 		//Rotating
-		if(player == 1){
+		if(winner == 1){
 			spriteWin.setRotation(90);
 			spriteLoose.setRotation(-90);
 		}else{
@@ -605,14 +618,46 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 			spriteLoose.setRotation(90);
 		}
 		
-		scene.attachChild(spriteWin);		
-		scene.attachChild(spriteLoose);
+		this.endGameScene.attachChild(spriteWin);
+		this.endGameScene.attachChild(spriteLoose);
 		
-	}
-
-
+		final int posXMainMenu = hCameraH + middleTextureRegionHorizontalSizeByTwo(textureRegionPauseMainMenu);
+		final int posYMainMenu = hCameraV + this.textureRegionPauseMainMenu.getHeight();
+		final Sprite buttonMainMenu = new Sprite(posXMainMenu,posYMainMenu,textureRegionPauseMainMenu){
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {				
+				scene.clearChildScene();
+				menuScreen.getEngine().setScene(menuScreen.scene);
+				return false;
+			};
+		};
+		this.endGameScene.registerTouchArea(buttonMainMenu);
+		this.endGameScene.attachChild(buttonMainMenu);
+		
+		final int posXNewGame = hCameraH - this.textureRegionPauseNewGame.getWidth() - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseNewGame);
+		final int posYNewGame = hCameraV + this.textureRegionPauseNewGame.getHeight();
+		buttonNewGame = new Sprite(posXNewGame,posYNewGame,textureRegionPauseNewGame){
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {				
+				pointsPlayer1 = 0;
+				pointsPlayer2 = 0;
+				scorePlayer1.setText("0");
+				scorePlayer2.setText("0");
+				scene.clearChildScene();
+				menuScreen.gameRunning = true;
+				menuScreen.runOnUpdateThread(new Runnable() {
+					@Override
+					public void run() {						
+						bodyBall.setTransform((CAMERA_WIDTH / 2)
+								/ PTM_RATIO, (CAMERA_HEIGHT / 2)
+								/ PTM_RATIO, 0f);
+								bodyBall.setLinearVelocity(-10, 17);
+					}
+				});
+				return false;			
+			};
+			
+		};
+		this.endGameScene.registerTouchArea(buttonNewGame);
+		this.endGameScene.attachChild(buttonNewGame);
+		this.endGameScene.setBackgroundEnabled(false);
+	}	
 }
-
-
-
-

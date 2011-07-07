@@ -64,7 +64,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	private Sprite spriteMultiPlayer;
 	private Sprite spriteOptions;
 	private Sprite spriteSound;
-	private Sprite spriteExit;
+	public Sprite spriteExit;
 	public String selectedMap;
 	public int modeSelected = 0;
 	public float timePassed;
