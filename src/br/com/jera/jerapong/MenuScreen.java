@@ -133,7 +133,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	
 	public Scene SceneMenu(final Activity activity){		
 		scene = new Scene(1);
-		//scene.setOnSceneTouchListener(this);
 		
 		/**
 		 * Menu background resources

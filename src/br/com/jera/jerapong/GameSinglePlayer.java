@@ -232,12 +232,6 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		scene.registerTouchArea(shapeTouchPlayer1);
 
 		/**
-		 * Middle line
-		 */
-		/*final Sprite middleLine = new Sprite(CAMERA_WIDTH / 2, 0, this.textureRegionMiddleLine);
-		scene.attachChild(middleLine);*/
-
-		/**
 		 * Ball
 		 */
 		this.spriteBall = new Sprite((CAMERA_WIDTH / 2)	- (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - 
@@ -245,14 +239,14 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall, BodyType.DynamicBody, FIXTURE_BALL);
 		scene.attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-		menuScreen.runOnUpdateThread(new Runnable() {
+		scene.registerUpdateHandler(new TimerHandler(5f, false,new ITimerCallback() {
 			@Override
-			public void run() {
-				bodyBall.setLinearVelocity(-10, 17);
-				bodyBall.setLinearVelocity(-10, 17);				
+			public void onTimePassed(final TimerHandler pTimerHandler) {
+				menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
+				bodyBall.setLinearVelocity(-17,15);
+				activeBall = true;
 			}
-		});
-		activeBall = true;		
+		}));		
 
 		scene.setTouchAreaBindingEnabled(true);
 		menuScreen.getEngine().setScene(scene);
@@ -473,8 +467,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		posY = hCameraV - middleTextureRegionVerticalSizeByTwo(textureRegionPauseNewGame);
 		final Sprite buttonPauseNewGame = new Sprite(posX,posY,textureRegionPauseNewGame){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				scene.clearChildScene();
-				menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
+				scene.clearChildScene();				
 				menuScreen.runOnUpdateThread(new Runnable() {
 					@Override
 					public void run() {
