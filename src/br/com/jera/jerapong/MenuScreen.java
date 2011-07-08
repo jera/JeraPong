@@ -44,9 +44,10 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	private int CAMERA_HEIGHT = 0;	
 	public GameMultiPlayer gameMultiPlayer;
 	public GameSinglePlayer gameSinglePlayer;
-	private ScoreScreen scoreScreen;
+	public ScoreScreen scoreScreen;
 	public static String choiceMap;
 	private DataHelper dataHelper;
+	public int ScoreMode = 0;
 	
 	/** ######## ENGINE ######## **/
 	
@@ -57,20 +58,20 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	private Texture textureBackground;
 	private Texture textureSinglePlayer;
 	private Texture textureMultiPlayer;
-	private Texture textureOptions;
+	private Texture textureHighScore;
 	private Texture textureSound;
 	private Texture textureExit;
 	
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionSinglePlayer;
 	private TextureRegion textureRegionMultiPlayer;
-	private TextureRegion textureRegionOptions;
+	private TextureRegion textureRegionHighScore;
 	private TextureRegion textureRegionSound;
 	private TextureRegion textureRegionExit;
 	
 	private Sprite spriteSinglePlayer;
 	private Sprite spriteMultiPlayer;
-	private Sprite spriteOptions;
+	private Sprite spriteHighScore;
 	private Sprite spriteSound;
 	private Sprite spriteExit;
 	public String selectedMap;
@@ -81,10 +82,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	
 	@Override
 	public Engine onLoadEngine() {
-		
-		Log.e("DATABASE", "OPENHELPER loading");
-		dataHelper = new DataHelper(getBaseContext());
-		Log.e("DATABASE", "OPENHELPER OK");
 		
 		CAMERA_HEIGHT = getWindowManager().getDefaultDisplay().getHeight();
 		CAMERA_WIDTH = getWindowManager().getDefaultDisplay().getWidth();
@@ -112,21 +109,21 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.textureBackground = new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.textureSinglePlayer = new Texture(1024,256,TextureOptions.DEFAULT);
 		this.textureMultiPlayer = new Texture(1024,256,TextureOptions.DEFAULT);
-		this.textureOptions = new Texture(256,64,TextureOptions.DEFAULT);
+		this.textureHighScore = new Texture(256,64,TextureOptions.DEFAULT);
 		this.textureSound = new Texture(256,64,TextureOptions.DEFAULT);
 		this.textureExit = new Texture(256,64,TextureOptions.DEFAULT);
 		
 		this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/menu/menu_bg.jpg",0,0);
 		this.textureRegionSinglePlayer = TextureRegionFactory.createFromAsset(this.textureSinglePlayer, this, "gfx/menu/button_singleplayer.png",0,0);
 		this.textureRegionMultiPlayer = TextureRegionFactory.createFromAsset(this.textureMultiPlayer, this, "gfx/menu/button_multiplayer.png",0,0);
-		this.textureRegionOptions = TextureRegionFactory.createFromAsset(this.textureOptions, this, "gfx/menu/button_options.png",0,0);
+		this.textureRegionHighScore = TextureRegionFactory.createFromAsset(this.textureHighScore, this, "gfx/menu/btn_high_scores.png",0,0);
 		this.textureRegionSound = TextureRegionFactory.createFromAsset(this.textureSound, this, "gfx/menu/button_sound_on.png",0,0);
 		this.textureRegionExit = TextureRegionFactory.createFromAsset(this.textureExit, this, "gfx/menu/button_exit.png",0,0);
 		
 		this.mEngine.getTextureManager().loadTexture(this.textureBackground);
 		this.mEngine.getTextureManager().loadTexture(this.textureSinglePlayer);
 		this.mEngine.getTextureManager().loadTexture(this.textureMultiPlayer);		
-		this.mEngine.getTextureManager().loadTexture(this.textureOptions);
+		this.mEngine.getTextureManager().loadTexture(this.textureHighScore);
 		this.mEngine.getTextureManager().loadTexture(this.textureSound);
 		this.mEngine.getTextureManager().loadTexture(this.textureExit);
 
@@ -163,14 +160,14 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		final int middleScreenHorizontal = CAMERA_WIDTH / 2;
 		int widthSinglePlayer = middleScreenHorizontal - (this.textureRegionSinglePlayer.getWidth() + 20);
 		int widthMultiPlayer = middleScreenHorizontal + 20;
-		int widthOptions = middleScreenHorizontal - middleTextureRegionHorizontalSizeByTwo(this.textureRegionOptions);
+		int widthOptions = middleScreenHorizontal - middleTextureRegionHorizontalSizeByTwo(this.textureRegionHighScore);
 		int widthSound = widthOptions - (this.textureRegionSound.getWidth() + 20);
 		int widthExit = widthOptions + (this.textureRegionExit.getWidth() + 20);
 		
 		final int middleScreenVertical = CAMERA_HEIGHT / 2;
 		int heightSinglePlayer = middleScreenVertical - middleTextureRegionVerticalSizeByTwo(this.textureRegionSinglePlayer);
 		int heightMultiPlayer = heightSinglePlayer;
-		int heightOptions = middleScreenVertical + this.textureRegionOptions.getHeight();
+		int heightOptions = middleScreenVertical + this.textureRegionHighScore.getHeight();
 		int heightSound = heightOptions;
 		int heightExit = heightOptions;
 		
@@ -207,8 +204,12 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		/**
 		 * Loading options button resources
 		 */
-		this.spriteOptions = new Sprite(widthOptions, heightOptions, this.textureRegionOptions){
+		this.spriteHighScore = new Sprite(widthOptions, heightOptions, this.textureRegionHighScore){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				
+				ScoreMode = 1;
+				
+				DataHelper dataHelper = new DataHelper(MenuScreen.this.getBaseContext());
 				
 				Cursor cursor = dataHelper.select();
 				int x = 0;
@@ -224,13 +225,14 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 					x++;
 				}
 				
-				LoadingScoreScreen();
+				MenuScreen.this.LoadingScoreScreen();
 				MenuScreen.this.scoreScreen.ScoreScene(vectorPlayer,vectorScore);
+				
 				return false;
 			};
 		};
-		scene.attachChild(this.spriteOptions);
-		scene.registerTouchArea(this.spriteOptions);
+		scene.attachChild(this.spriteHighScore);
+		scene.registerTouchArea(this.spriteHighScore);
 		
 		/**
 		 * Loading sound button resources
@@ -390,12 +392,18 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.scoreScreen.setCAMERA_WIDTH(CAMERA_WIDTH);
 		
 		this.scoreScreen.setTextureBackground( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		this.scoreScreen.setTextureBtnNewGame(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		this.scoreScreen.setTextureBtnBack(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 		this.scoreScreen.setTextureFontScore(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 		
 		this.scoreScreen.setTextureRegionBackground(TextureRegionFactory.createFromAsset(this.scoreScreen.getTextureBackground(), this, "gfx/score/score_bg.png",0,0));
+		this.scoreScreen.setTextureRegionBtnNewGame(TextureRegionFactory.createFromAsset(this.scoreScreen.getTextureBtnNewGame(), this, "gfx/score/button_new_game.png",0,0));
+		this.scoreScreen.setTextureRegionBtnBack(TextureRegionFactory.createFromAsset(this.scoreScreen.getTextureBtnBack(), this, "gfx/score/back_to_menu.png",0,0));
 		this.scoreScreen.setFontScore(new Font(this.scoreScreen.getTextureFontScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32, true, Color.WHITE));
 
 		this.mEngine.getTextureManager().loadTexture(this.scoreScreen.getTextureBackground());
+		this.mEngine.getTextureManager().loadTexture(this.scoreScreen.getTextureBtnNewGame());
+		this.mEngine.getTextureManager().loadTexture(this.scoreScreen.getTextureBtnBack());
 		this.mEngine.getTextureManager().loadTexture(this.scoreScreen.getTextureFontScore());
 		this.mEngine.getFontManager().loadFont(this.scoreScreen.getFontScore());
 		
@@ -428,13 +436,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 				this.gameMultiPlayer.Pause();
 			}
 			
-			//if (this.getEngine().isRunning()) {
-				//scene.setChildScene(this.pauseGameScene, false, true, true);
-				//menuScreen.getEngine().stop();
-			//} else {
-				//this.scene.clearChildScene();
-				//menuScreen.getEngine().start();
-			//}
 			return true;
 		} else {
 			return super.onKeyDown(pKeyCode, pEvent);
@@ -446,7 +447,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	    Dialog dialog;
 	    switch(id) {
 	    case GameSinglePlayer.SUBMIT_DIALOG:
-	        dialog = new DialogNamePlayer(this,this.gameSinglePlayer.getPlayerScore());
+	        dialog = new SubmitScore(this,this.gameSinglePlayer.getPlayerScore());
 	        break;
 	    default:
 	        dialog = null;
