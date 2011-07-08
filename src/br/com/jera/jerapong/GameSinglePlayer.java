@@ -63,9 +63,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private Texture textureBackgroundPause;
 	private Texture texturePauseContinue;
 	private Texture texturePauseNewGame;
-	private Texture texturePauseRestart;
 	private Texture texturePauseMainMenu;
-	
+
 
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionPlayer1;
@@ -77,19 +76,16 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private TextureRegion textureRegionBackgroundPause;
 	private TextureRegion textureRegionPauseContinue;
 	private TextureRegion textureRegionPauseNewGame;
-	private TextureRegion textureRegionPauseRestart;
 	private TextureRegion textureRegionPauseMainMenu;
 	
 	private PhysicsWorld physicWorld;
-	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory
-			.createFixtureDef(10f, 1f, 0f);
-	private static final FixtureDef FIXTURE_BALL = PhysicsFactory
-			.createFixtureDef(1f, 1f, 0f); // densidade,restituição,frição
+	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.2f, 0f);
+	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(1f, 1f, 0f); // densidade,restituição,frição
 
 	private Sprite spritePlayer1;
 	private Shape shapeTouchPlayer1;
 	private Body bodyPlayer1;
-	
+
 	private Sprite spriteBarRight;
 	private Body bodyBarRight;
 
@@ -123,17 +119,17 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 
 	/** ######## GAME ######## **/
-	
+
 	public GameSinglePlayer(MenuScreen menuScreen) {
 		this.menuScreen = menuScreen;
 	}
-	
+
 	public void GameScene() {
 		CreateGameMenu();
-		
+
 		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
-		
+
 		this.physicWorld = new PhysicsWorld(new Vector2(0, 0), false);
 		this.physicWorld.setContactListener(this);
 		this.PTM_RATIO = PhysicsConnector.PIXEL_TO_METER_RATIO_DEFAULT;
@@ -146,7 +142,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(10f,1f, 0f);
 		PhysicsFactory.createBoxBody(this.physicWorld, ground,BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(this.physicWorld, roof,BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(this.physicWorld, left,BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(this.physicWorld, left,BodyType.StaticBody, FIXTURE_PLAYERS);
 		PhysicsFactory.createBoxBody(this.physicWorld, right,BodyType.StaticBody, wallFixtureDef);
 
 		scene.getFirstChild().attachChild(ground);
@@ -155,7 +151,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		scene.getFirstChild().attachChild(right);
 
 		scene.registerUpdateHandler(this.physicWorld);
-		
+
 		/**
 		 * Background
 		 */
@@ -166,7 +162,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		background.setScaleX(scalaXBG);
 		background.setScaleY(scalaYBG);		
 		scene.attachChild(background);
-		
+
 		/**
 		 * Background score
 		 */
@@ -174,7 +170,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		int positionY = 20;
 		final Sprite bgScore = new Sprite(positionX,positionY,this.textureRegionBGScore);
 		scene.attachChild(bgScore);
-		
+
 		/**
 		 * Timer
 		 */
@@ -182,27 +178,27 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		scene.attachChild(timePlaying);
 		scene.registerUpdateHandler(new TimerHandler(0.1f, true,
 				new ITimerCallback() {
-					@Override
-					public void onTimePassed(final TimerHandler pTimerHandler) {
-						GameSinglePlayer.this.tempo = menuScreen.getEngine().getSecondsElapsedTotal() - menuScreen.timePassed;						
-						NumberFormat tp = NumberFormat.getInstance();
-						tp.setMinimumIntegerDigits(1);
-						tp.setMaximumIntegerDigits(10);
-						tp.setMinimumFractionDigits(1);
-						tp.setMaximumFractionDigits(1);
-						timePlaying.setText(tp.format(GameSinglePlayer.this.tempo) + " s");
-					}
-				}));
-		
+			@Override
+			public void onTimePassed(final TimerHandler pTimerHandler) {
+				GameSinglePlayer.this.tempo = menuScreen.getEngine().getSecondsElapsedTotal() - menuScreen.timePassed;						
+				NumberFormat tp = NumberFormat.getInstance();
+				tp.setMinimumIntegerDigits(1);
+				tp.setMaximumIntegerDigits(10);
+				tp.setMinimumFractionDigits(1);
+				tp.setMaximumFractionDigits(1);
+				timePlaying.setText(tp.format(GameSinglePlayer.this.tempo) + " s");
+			}
+		}));
+
 		/**
 		 * Bar Right
 		 */
 		positionX = CAMERA_WIDTH - textureRegionBarRight.getWidth();
 		positionY = 0;
 		this.spriteBarRight = new Sprite(positionX,positionY,this.textureRegionBarRight);
-		this.bodyBarRight = PhysicsFactory.createBoxBody(this.physicWorld, this.spriteBarRight, BodyType.StaticBody, FIXTURE_PLAYERS);
+		this.bodyBarRight = PhysicsFactory.createBoxBody(this.physicWorld, this.spriteBarRight, BodyType.StaticBody, wallFixtureDef);
 		scene.attachChild(spriteBarRight);
-		
+
 		/**
 		 * Player1
 		 */
@@ -219,7 +215,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				float touchY = pSceneTouchEvent.getY();
 				final float minimumPosY = (spritePlayer1.getHeight() / 2) + 10;
 				final float maximumPosY = CAMERA_HEIGHT
-						- (spritePlayer1.getHeight() / 2) - 10;
+				- (spritePlayer1.getHeight() / 2) - 10;
 				switch (pSceneTouchEvent.getAction()) {
 				case TouchEvent.ACTION_MOVE:
 					if (touchY < minimumPosY)
@@ -235,13 +231,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 			}
 		};
 		scene.registerTouchArea(shapeTouchPlayer1);
-		
-		/**
-		 * Middle line
-		 */
-		final Sprite middleLine = new Sprite(CAMERA_WIDTH / 2, 0, this.textureRegionMiddleLine);
-		scene.attachChild(middleLine);
-		
+
 		/**
 		 * Ball
 		 */
@@ -250,11 +240,15 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall, BodyType.DynamicBody, FIXTURE_BALL);
 		scene.attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-		this.bodyBall.setLinearVelocity(5, 5);
-		activeBall = true;
-		
-		
-		
+		scene.registerUpdateHandler(new TimerHandler(5f, false,new ITimerCallback() {
+			@Override
+			public void onTimePassed(final TimerHandler pTimerHandler) {
+				menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
+				bodyBall.setLinearVelocity(-17,15);
+				activeBall = true;
+			}
+		}));		
+
 		scene.setTouchAreaBindingEnabled(true);
 		menuScreen.getEngine().setScene(scene);
 		Log.e("scene game", "OK");
@@ -266,25 +260,25 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		Body bodyContact2 = contact.getFixtureB().getBody();
 		if (bodyContact1.equals(bodyBall) || bodyContact2.equals(bodyBall)) {
 			if (bodyContact1.equals(bodyBarRight) || bodyContact2.equals(bodyBarRight)) {
-				
+
 				removeBall = true;
 				timePlaying.setVisible(false);
 				final Scene scene = menuScreen.getEngine().getScene();
 				NumberFormat tp = NumberFormat.getInstance();
 				tp.setMinimumIntegerDigits(1);
 				tp.setMaximumIntegerDigits(10);
-				
+
 				tp.setMinimumFractionDigits(1);
 				tp.setMaximumFractionDigits(1);
 				final String textVictory = new String("Your time: " + tp.format(GameSinglePlayer.this.tempo).toString() + " s");
 				final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
 				text.registerEntityModifier(
-					new SequenceEntityModifier(
-						new ParallelEntityModifier(
-							new AlphaModifier(2, 0.0f, 1.0f),
-							new ScaleModifier(2, 0.5f, 1.5f)
-						)									
-					)
+						new SequenceEntityModifier(
+								new ParallelEntityModifier(
+										new AlphaModifier(2, 0.0f, 1.0f),
+										new ScaleModifier(2, 0.5f, 1.5f)
+								)									
+						)
 				);
 				text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 				scene.attachChild(text);
@@ -300,12 +294,15 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				});
 			}
 			else{
-				pingSound.play();
+				if(menuScreen.sound == 1){
+					pingSound.play();
+				}
 			}
 		}		
 		menuScreen.runOnUpdateThread(runBall());
 
 	}
+
 	private Runnable runBall() {
 		if (runBall == null) {
 			this.runBall = new Runnable() {
@@ -313,8 +310,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				public void run() {
 					if (removeBall) {
 						activeBall = false;
-						bodyBall.setTransform((CAMERA_WIDTH / PTM_RATIO) + 10,
-								(CAMERA_HEIGHT / PTM_RATIO) + 10, 0);
+						bodyBall.setTransform((CAMERA_WIDTH / PTM_RATIO) + 10,(CAMERA_HEIGHT / PTM_RATIO) + 10, 0);
 						removeBall = false;
 						bodyBall.setLinearVelocity(0f,0f);
 						if (resetBall) {
@@ -367,8 +363,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		});
 
 	}
-	
-	
+
+
 
 	@Override
 	public void preSolve(Contact pContact) {
@@ -378,12 +374,12 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void postSolve(Contact pContact) {
 
 	}
-	
+
 	public int getCAMERA_WIDTH() { return CAMERA_WIDTH; }
 	public int getCAMERA_HEIGHT() { return CAMERA_HEIGHT; }
 	public void setCAMERA_WIDTH(int cAMERA_WIDTH) { CAMERA_WIDTH = cAMERA_WIDTH;}	
 	public void setCAMERA_HEIGHT(int cAMERA_HEIGHT) { CAMERA_HEIGHT = cAMERA_HEIGHT; }
-	
+
 	public void setTextureBackground(Texture t) { this.textureBackground = t; }
 	public void setTexturePlayer1(Texture t) {	this.texturePlayer1 = t; }
 	public void setTextureBall(Texture t) { this.textureBall = t; }
@@ -396,7 +392,6 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setTextureBackgroundPause(Texture t) { this.textureBackgroundPause= t; }
 	public void setTexturePauseContinue(Texture t) { this.texturePauseContinue = t; }
 	public void setTexturePauseNewGame(Texture t) { this.texturePauseNewGame = t; }
-	public void setTexturePauseRestart(Texture t) { this.texturePauseRestart = t; }
 	public void setTexturePauseMainMenu(Texture t) { this.texturePauseMainMenu = t; }	
 	public void setTextureRegionBackground(TextureRegion tr) {	this.textureRegionBackground = tr; }
 	public void setTextureRegionPlayer1(TextureRegion tr) { this.textureRegionPlayer1 = tr; }
@@ -408,12 +403,11 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setTextureRegionBackgroundPause(TextureRegion tr) { this.textureRegionBackgroundPause = tr; }
 	public void setTextureRegionPauseContinue(TextureRegion tr) { this.textureRegionPauseContinue = tr; }
 	public void setTextureRegionPauseNewGame(TextureRegion tr) { this.textureRegionPauseNewGame = tr; }
-	public void setTextureRegionPauseRestart(TextureRegion tr) { this.textureRegionPauseRestart = tr; }
 	public void setTextureRegionPauseMainMenu(TextureRegion tr) { this.textureRegionPauseMainMenu = tr; }	
 	public void setFontScore(Font fontScore) { this.fontScore = fontScore; }
 	public void setFontVictory(Font fontVictory) { this.fontVictory = fontVictory; }
 	public void setChoiceMap(String choiceMap) { this.choiceMap = choiceMap; }	
-	
+
 	public Texture getTextureBackground() { return textureBackground; }	
 	public Texture getTexturePlayer1() { return texturePlayer1;	}	
 	public Texture getTextureBall() { return textureBall; }	
@@ -426,9 +420,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public Texture getTextureBackgroundPause() { return textureBackgroundPause; }
 	public Texture getTexturePauseContinue() { return texturePauseContinue; }
 	public Texture getTexturePauseNewGame() { return texturePauseNewGame; }
-	public Texture getTexturePauseRestart() { return texturePauseRestart; }
 	public Texture getTexturePauseMainMenu() { return texturePauseMainMenu; }
-	
+
 	public TextureRegion getTextureRegionBackground() {	return textureRegionBackground; }	
 	public TextureRegion getTextureRegionPlayer1() { return textureRegionPlayer1; }
 	public TextureRegion getTextureRegionBall() { return textureRegionBall;	}
@@ -439,28 +432,17 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public TextureRegion getTextureRegionBackgroundPause() { return textureRegionBackgroundPause; }
 	public TextureRegion getTextureRegionPauseContinue() { return textureRegionPauseContinue; }
 	public TextureRegion getTextureRegionPauseNewGame() { return textureRegionPauseNewGame; }
-	public TextureRegion getTextureRegionPauseRestart() { return textureRegionPauseRestart; }
 	public TextureRegion getTextureRegionPauseMainMenu() { return textureRegionPauseMainMenu; }
 	public Font getFontScore() { return fontScore; }	
 	public Font getFontVictory() { return fontVictory; }	
 	public String getChoiceMap() { return choiceMap; }
-	
-	public void GameMenu(){
-		if (menuScreen.getEngine().isRunning()) {
-			if(menuScreen.gameRunning){
-				scene.setChildScene(this.pauseGameScene, false, true, true);
-				menuScreen.getEngine().stop();
-			}			
-		} else {
-			if(menuScreen.gameRunning){
-				this.scene.clearChildScene();
-				menuScreen.getEngine().start();				
-			}
 
+	public void GameMenu(){
+		if(menuScreen.gameRunning){
+			scene.setChildScene(this.pauseGameScene, false, true, true);
 		}
-		
 	}
-	
+
 	public void CreateGameMenu(){
 		int posX, posY, hCameraH, hCameraV;
 		this.pauseGameScene = new CameraScene(1, this.menuScreen.camera);
@@ -474,40 +456,69 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		background.setScaleX(scalaXBG);
 		background.setScaleY(scalaYBG);
 		this.pauseGameScene.attachChild(background);
-		
+
 		/**
 		 * Button Continue
 		 */
 		hCameraH = CAMERA_WIDTH / 2;
 		hCameraV = CAMERA_HEIGHT / 2;
 		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseContinue);
-		posY = hCameraV - this.textureRegionPauseContinue.getHeight() - middleTextureRegionVerticalSizeByTwo(textureRegionPauseContinue);
-		final Sprite buttonPauseContinue = new Sprite(posX,posY,textureRegionPauseContinue);
+		posY = hCameraV - this.textureRegionPauseContinue.getHeight() - middleTextureRegionVerticalSizeByTwo(textureRegionPauseContinue) - 15;
+		final Sprite buttonPauseContinue = new Sprite(posX,posY,textureRegionPauseContinue){
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				scene.clearChildScene();
+				return false;
+			};
+		};
 		this.pauseGameScene.attachChild(buttonPauseContinue);
-		
+		this.pauseGameScene.registerTouchArea(buttonPauseContinue);
+
 		/**
 		 * Button New Game
 		 */
 		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseNewGame);
 		posY = hCameraV - middleTextureRegionVerticalSizeByTwo(textureRegionPauseNewGame);
-		final Sprite buttonPauseNewGame = new Sprite(posX,posY,textureRegionPauseNewGame);
+		final Sprite buttonPauseNewGame = new Sprite(posX,posY,textureRegionPauseNewGame){
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				scene.clearChildScene();				
+				menuScreen.runOnUpdateThread(new Runnable() {
+					@Override
+					public void run() {
+						bodyBall.setTransform((CAMERA_WIDTH / 2)
+								/ PTM_RATIO, (CAMERA_HEIGHT / 2)
+								/ PTM_RATIO, 0f);	
+						bodyBall.setLinearVelocity(-10, 17);
+					}
+				});				
+				return false;
+			};
+		};
+		this.pauseGameScene.registerTouchArea(buttonPauseNewGame);
 		this.pauseGameScene.attachChild(buttonPauseNewGame);
-		
+
 		/**
-		 * Button Restart
+		 * Button Main Menu
 		 */
-		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseRestart);
-		posY = hCameraV + middleTextureRegionVerticalSizeByTwo(textureRegionPauseRestart);
-		final Sprite buttonPauseRestart = new Sprite(posX,posY,textureRegionPauseRestart);
-		this.pauseGameScene.attachChild(buttonPauseRestart);
-		
+		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseMainMenu);
+		posY = hCameraV + middleTextureRegionVerticalSizeByTwo(textureRegionPauseMainMenu) + 15;
+		final Sprite buttonPauseMainMenu = new Sprite(posX,posY,textureRegionPauseMainMenu){
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				scene.clearChildScene();
+				menuScreen.getEngine().setScene(menuScreen.scene);
+				return false;
+			};
+		};
+		this.pauseGameScene.registerTouchArea(buttonPauseMainMenu);
+		this.pauseGameScene.attachChild(buttonPauseMainMenu);
+
 		this.pauseGameScene.setBackgroundEnabled(false);
+		this.pauseGameScene.setTouchAreaBindingEnabled(true);
 	}
-	
+
 	public int middleTextureRegionHorizontalSizeByTwo(TextureRegion tr){
 		return (tr.getWidth() / 2);
 	}
-	
+
 	public int middleTextureRegionVerticalSizeByTwo(TextureRegion tr){
 		return (tr.getHeight() / 2);
 	}
@@ -519,8 +530,4 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setPlayerScore(String playerScore) {
 		this.playerScore = playerScore;
 	}
-	
-	
-	
-	
 }
