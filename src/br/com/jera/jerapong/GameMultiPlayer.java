@@ -1,7 +1,5 @@
 package br.com.jera.jerapong;
 
-import java.text.NumberFormat;
-
 import org.anddev.andengine.audio.sound.Sound;
 import org.anddev.andengine.engine.handler.timer.ITimerCallback;
 import org.anddev.andengine.engine.handler.timer.TimerHandler;
@@ -11,6 +9,7 @@ import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
+import org.anddev.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
@@ -131,13 +130,13 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		this.menuScreen = menuScreen;
 	}
 	
-	public void GameScene() {
+	public void GameScene() {		
 		CreateGameMenu();
 		
 		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
 
-		this.physicWorld = new PhysicsWorld(new Vector2(0,0),false);
+		this.physicWorld = new FixedStepPhysicsWorld(50,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
 		this.PTM_RATIO = PhysicsConnector.PIXEL_TO_METER_RATIO_DEFAULT;
 

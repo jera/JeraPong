@@ -19,6 +19,7 @@ import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
 import org.anddev.andengine.entity.text.Text;
 import org.anddev.andengine.entity.text.TickerText;
+import org.anddev.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
 import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
@@ -130,7 +131,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
 
-		this.physicWorld = new PhysicsWorld(new Vector2(0, 0), false);
+		this.physicWorld = new FixedStepPhysicsWorld(30,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
 		this.PTM_RATIO = PhysicsConnector.PIXEL_TO_METER_RATIO_DEFAULT;
 
@@ -263,15 +264,15 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 				removeBall = true;
 				timePlaying.setVisible(false);
-				final Scene scene = menuScreen.getEngine().getScene();
+				//final Scene scene = menuScreen.getEngine().getScene();
 				NumberFormat tp = NumberFormat.getInstance();
 				tp.setMinimumIntegerDigits(1);
 				tp.setMaximumIntegerDigits(10);
 
 				tp.setMinimumFractionDigits(1);
 				tp.setMaximumFractionDigits(1);
-				final String textVictory = new String("Your time: " + tp.format(GameSinglePlayer.this.tempo).toString() + " s");
-				final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
+				//final String textVictory = new String("Your time: " + tp.format(GameSinglePlayer.this.tempo).toString() + " s");
+				/*final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
 				text.registerEntityModifier(
 						new SequenceEntityModifier(
 								new ParallelEntityModifier(
@@ -281,7 +282,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 						)
 				);
 				text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-				scene.attachChild(text);
+				scene.attachChild(text);*/
 				
 				this.setPlayerScore(tp.format(GameSinglePlayer.this.tempo).toString());
 				
