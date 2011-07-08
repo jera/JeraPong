@@ -289,7 +289,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 				scene.attachChild(text);
 				
-				this.setPlayerScore(tp.format(GameSinglePlayer.this.tempo).toString());
+				this.playerScore  = (tp.format(GameSinglePlayer.this.tempo).toString());
 				
 				// here dialog input text
 				menuScreen.runOnUiThread(new Runnable() {

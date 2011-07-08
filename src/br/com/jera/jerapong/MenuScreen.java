@@ -435,7 +435,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 			else if(modeSelected == 2){
 				this.gameMultiPlayer.Pause();
 			}
-			
 			return true;
 		} else {
 			return super.onKeyDown(pKeyCode, pEvent);
@@ -447,7 +446,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	    Dialog dialog;
 	    switch(id) {
 	    case GameSinglePlayer.SUBMIT_DIALOG:
-	        dialog = new SubmitScore(this,this.gameSinglePlayer.getPlayerScore());
+	        dialog = new SubmitScore(this);
 	        break;
 	    default:
 	        dialog = null;

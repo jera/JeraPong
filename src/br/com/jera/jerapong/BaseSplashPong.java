@@ -66,11 +66,11 @@ public abstract class BaseSplashPong extends BaseGameActivity {
 	protected float getSplashScaleTo() {
 		return 1f;
 	}
-
+	
 	@Override
 	public void onLoadComplete() {
 	}
-
+	
 	@Override
 	public Engine onLoadEngine() {
 		this.mSplashTextureSource = this.onGetSplashTextureSource();
