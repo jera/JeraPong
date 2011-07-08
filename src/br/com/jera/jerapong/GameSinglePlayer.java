@@ -44,11 +44,13 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private int CAMERA_WIDTH;
 	private int CAMERA_HEIGHT;
 	private float PTM_RATIO;
+	public static final int SUBMIT_DIALOG = 666;
+	private String playerScore;
 
 	private MenuScreen menuScreen;
 
 	/** ######## GAME ######## **/
-
+	
 	private Texture textureBackground;
 	private Texture texturePlayer1;
 	private Texture textureBall;
@@ -75,7 +77,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private TextureRegion textureRegionPauseContinue;
 	private TextureRegion textureRegionPauseNewGame;
 	private TextureRegion textureRegionPauseMainMenu;
-
+	
 	private PhysicsWorld physicWorld;
 	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.2f, 0f);
 	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(1f, 1f, 0f); // densidade,restituição,frição
@@ -117,7 +119,6 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 
 	/** ######## GAME ######## **/
-
 
 	public GameSinglePlayer(MenuScreen menuScreen) {
 		this.menuScreen = menuScreen;
@@ -280,7 +281,17 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 						)
 				);
 				text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-				scene.attachChild(text);				
+				scene.attachChild(text);
+				
+				this.setPlayerScore(tp.format(GameSinglePlayer.this.tempo).toString());
+				
+				// here dialog input text
+				menuScreen.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						menuScreen.showDialog(SUBMIT_DIALOG);
+					}
+				});
 			}
 			else{
 				pingSound.play();
@@ -510,4 +521,11 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		return (tr.getHeight() / 2);
 	}
 
+	public String getPlayerScore() {
+		return playerScore;
+	}
+
+	public void setPlayerScore(String playerScore) {
+		this.playerScore = playerScore;
+	}
 }

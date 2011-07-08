@@ -28,9 +28,14 @@
 			android:label="@string/app_name">
 		</activity>
 		<activity
-			android:name=".JeraPongGame"
+			android:name=".GameSinglePlayer"
 			android:label="@string/app_name">
 		</activity>
-
+		<activity
+			android:name=".GameMultiPlayer"
+			android:label="@string/app_name">
+		</activity>
+		
+		
 	</application>
 </manifest>
