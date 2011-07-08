@@ -25,16 +25,12 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.Debug;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View.OnCreateContextMenuListener;
-import android.widget.EditText;
 import android.widget.Toast;
 
 public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListener {
@@ -48,6 +44,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public ScoreScreen scoreScreen;
 	public static String choiceMap;
 	private DataHelper dataHelper;
+	public int sound = 1;
 	public int ScoreMode = 0;
 	
 	/** ######## ENGINE ######## **/
@@ -60,25 +57,29 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	private Texture textureSinglePlayer;
 	private Texture textureMultiPlayer;
 	private Texture textureHighScore;
-	private Texture textureSound;
+	private Texture textureSoundOn;
+	private Texture textureSoundOff;
 	private Texture textureExit;
 	
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionSinglePlayer;
 	private TextureRegion textureRegionMultiPlayer;
 	private TextureRegion textureRegionHighScore;
-	private TextureRegion textureRegionSound;
+	private TextureRegion textureRegionSoundOn;
+	private TextureRegion textureRegionSoundOff;
 	private TextureRegion textureRegionExit;
 	
 	private Sprite spriteSinglePlayer;
 	private Sprite spriteMultiPlayer;
 	private Sprite spriteHighScore;
-	private Sprite spriteSound;
+	private Sprite spriteSoundOn;
+	private Sprite spriteSoundOff;
 	public Sprite spriteExit;
 	public String selectedMap;
 	public int modeSelected = 0;
 	public float timePassed;
 	public boolean gameRunning = false;
+	private boolean onOff = true;
 	
 	Scene scene;
 	/** ######## MENU ######## **/
@@ -113,21 +114,24 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.textureSinglePlayer = new Texture(1024,256,TextureOptions.DEFAULT);
 		this.textureMultiPlayer = new Texture(1024,256,TextureOptions.DEFAULT);
 		this.textureHighScore = new Texture(256,64,TextureOptions.DEFAULT);
-		this.textureSound = new Texture(256,64,TextureOptions.DEFAULT);
+		this.textureSoundOn = new Texture(256,64,TextureOptions.DEFAULT);
+		this.textureSoundOff = new Texture(256,64,TextureOptions.DEFAULT);
 		this.textureExit = new Texture(256,64,TextureOptions.DEFAULT);
 		
 		this.textureRegionBackground = TextureRegionFactory.createFromAsset(this.textureBackground, this, "gfx/menu/menu_bg.jpg",0,0);
 		this.textureRegionSinglePlayer = TextureRegionFactory.createFromAsset(this.textureSinglePlayer, this, "gfx/menu/button_singleplayer.png",0,0);
 		this.textureRegionMultiPlayer = TextureRegionFactory.createFromAsset(this.textureMultiPlayer, this, "gfx/menu/button_multiplayer.png",0,0);
 		this.textureRegionHighScore = TextureRegionFactory.createFromAsset(this.textureHighScore, this, "gfx/menu/btn_high_scores.png",0,0);
-		this.textureRegionSound = TextureRegionFactory.createFromAsset(this.textureSound, this, "gfx/menu/button_sound_on.png",0,0);
+		this.textureRegionSoundOn = TextureRegionFactory.createFromAsset(this.textureSoundOn, this, "gfx/menu/button_sound_on.png",0,0);
+		this.textureRegionSoundOff = TextureRegionFactory.createFromAsset(this.textureSoundOff, this, "gfx/menu/button_sound_off.png",0,0);
 		this.textureRegionExit = TextureRegionFactory.createFromAsset(this.textureExit, this, "gfx/menu/button_exit.png",0,0);
 		
 		this.mEngine.getTextureManager().loadTexture(this.textureBackground);
 		this.mEngine.getTextureManager().loadTexture(this.textureSinglePlayer);
 		this.mEngine.getTextureManager().loadTexture(this.textureMultiPlayer);		
 		this.mEngine.getTextureManager().loadTexture(this.textureHighScore);
-		this.mEngine.getTextureManager().loadTexture(this.textureSound);
+		this.mEngine.getTextureManager().loadTexture(this.textureSoundOff);
+		this.mEngine.getTextureManager().loadTexture(this.textureSoundOn);
 		this.mEngine.getTextureManager().loadTexture(this.textureExit);
 
 		Log.e("resources menu","ok");
@@ -165,7 +169,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		int widthSinglePlayer = middleScreenHorizontal - (this.textureRegionSinglePlayer.getWidth() + 20);
 		int widthMultiPlayer = middleScreenHorizontal + 20;
 		int widthOptions = middleScreenHorizontal - middleTextureRegionHorizontalSizeByTwo(this.textureRegionHighScore);
-		int widthSound = widthOptions - (this.textureRegionSound.getWidth() + 20);
+		int widthSound = widthOptions - (this.textureRegionSoundOn.getWidth() + 20);
 		int widthExit = widthOptions + (this.textureRegionExit.getWidth() + 20);
 		
 		final int middleScreenVertical = CAMERA_HEIGHT / 2;
@@ -238,17 +242,31 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		scene.attachChild(this.spriteHighScore);
 		scene.registerTouchArea(this.spriteHighScore);
 		
+		this.spriteSoundOff = new Sprite(widthSound, heightSound, this.textureRegionSoundOff);
+		scene.attachChild(this.spriteSoundOff);
+		
 		/**
-		 * Loading sound button resources
+		 * Loading sound button on resources
 		 */
-		this.spriteSound = new Sprite(widthSound, heightSound, this.textureRegionSound){
+		this.spriteSoundOn = new Sprite(widthSound, heightSound, this.textureRegionSoundOn){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				if(MenuScreen.this.onOff == true){
+					MenuScreen.this.sound = 0;
+					scene.attachChild(spriteSoundOff);
+					scene.detachChild(spriteSoundOn);
+					MenuScreen.this.onOff = false;
+				}else{
+					MenuScreen.this.sound = 1;
+					scene.attachChild(spriteSoundOn);
+					scene.detachChild(spriteSoundOff);
+					MenuScreen.this.onOff = true;
+				}
 				
 				return false;
 			};
 		};
-		scene.attachChild(this.spriteSound);
-		scene.registerTouchArea(this.spriteSound);
+		scene.attachChild(this.spriteSoundOn);
+		scene.registerTouchArea(this.spriteSoundOn);
 		
 		/**
 		 * Loading exit button resources
@@ -446,7 +464,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 			else if(modeSelected == 2){
 				this.gameMultiPlayer.GameMenu();
 			}
-
 			return true;
 		}
 		if(pKeyCode == KeyEvent.KEYCODE_BACK && pEvent.getAction() == KeyEvent.ACTION_DOWN){
@@ -468,7 +485,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	    Dialog dialog;
 	    switch(id) {
 	    case GameSinglePlayer.SUBMIT_DIALOG:
-	        dialog = new SubmitScore(this,this.gameSinglePlayer.getPlayerScore());
+	        dialog = new SubmitScore(this);
 	        break;
 	    default:
 	        dialog = null;

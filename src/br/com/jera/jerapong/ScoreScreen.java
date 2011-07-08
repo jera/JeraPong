@@ -84,7 +84,11 @@ public class ScoreScreen {
 			
 			this.spriteBtnNewGame = new Sprite(WidthBtnNewGame, HeightBtnNewGame, this.textureRegionBtnNewGame){
 				public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-					ScoreScreen.this.menuScreen.gameSinglePlayer.GameScene();
+					
+					SelectMapDialog dialog = new SelectMapDialog(menuScreen);
+					menuScreen.modeSelected = 1;
+					dialog.show();
+					
 					return false;
 				};
 			};

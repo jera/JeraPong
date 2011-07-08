@@ -12,7 +12,7 @@ public class SubmitScore extends Dialog {
 	private MenuScreen menu;
 	private DataHelper dataHelper;
 	
-	public SubmitScore(final MenuScreen menu,final String score) {
+	public SubmitScore(final MenuScreen menu) {
 		super(menu);
 		this.menu = (MenuScreen) menu;
 		dataHelper = new DataHelper(menu.getBaseContext());
@@ -29,7 +29,7 @@ public class SubmitScore extends Dialog {
 				menu.ScoreMode = 0;
 				
 				DataHelper data = new DataHelper(getContext());
-				data.insert(editText.getEditableText().toString(), score);
+				data.insert(editText.getEditableText().toString(), menu.gameSinglePlayer.getPlayerScore());
 				
 				Cursor cursor = dataHelper.select();
 				int x = 0;

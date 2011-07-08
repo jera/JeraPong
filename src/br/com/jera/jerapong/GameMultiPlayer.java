@@ -331,7 +331,9 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 					playerTime = 2;
 				}
 			}
-			pingSound.play();
+			if(menuScreen.sound == 1){
+				pingSound.play();
+			}
 		}		
 		menuScreen.runOnUpdateThread(new Runnable() {
 			@Override
