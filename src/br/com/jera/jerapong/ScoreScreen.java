@@ -82,8 +82,8 @@ public class ScoreScreen {
 		
 		/** Table for ranking */
 		if(menuScreen.ScoreMode != 1){
-			int WidthBtnNewGame = (int)((this.CAMERA_WIDTH / 2) - (this.textureRegionBtnNewGame.getWidth() / 2));
-			int HeightBtnNewGame = (int)((this.CAMERA_HEIGHT /2) - (this.textureRegionBtnNewGame.getHeight() / 2) + 165) ;
+			int WidthBtnNewGame = (this.CAMERA_WIDTH / 2) - this.textureRegionBtnNewGame.getWidth() - 30;
+			int HeightBtnNewGame = (this.CAMERA_HEIGHT /2) - (this.textureRegionBtnNewGame.getHeight() / 2) + 165;
 			
 			this.spriteBtnNewGame = new Sprite(WidthBtnNewGame, HeightBtnNewGame, this.textureRegionBtnNewGame){
 				public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
@@ -98,14 +98,12 @@ public class ScoreScreen {
 			scene.attachChild(this.spriteBtnNewGame);
 			scene.registerTouchArea(this.spriteBtnNewGame);
 		}
-		int WidthBtnBack = (int)((this.CAMERA_WIDTH / 2) - (this.textureRegionBtnBack.getWidth() / 2));
-		int HeightBtnBack = (int)(this.CAMERA_HEIGHT /2) - (this.textureRegionBtnBack.getHeight() / 2) + 240 ;
+		int WidthBtnBack = (this.CAMERA_WIDTH / 2) + 70;
+		int HeightBtnBack = (this.CAMERA_HEIGHT /2) - (this.textureRegionBtnBack.getHeight() / 2) + 165;
 		
 		this.spriteBtnBack = new Sprite(WidthBtnBack, HeightBtnBack, this.textureRegionBtnBack){
-			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				
-				ScoreScreen.this.menuScreen.getEngine().setScene(ScoreScreen.this.menuScreen.onLoadScene());
-				
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {				
+				ScoreScreen.this.menuScreen.getEngine().setScene(ScoreScreen.this.menuScreen.onLoadScene());				
 				return false;
 			};
 		};
