@@ -15,7 +15,7 @@ public class SubmitScore extends Dialog {
 	public SubmitScore(final MenuScreen menu) {
 		super(menu);
 		this.menu = (MenuScreen) menu;
-		dataHelper = new DataHelper(menu.getBaseContext());
+		dataHelper = new DataHelper(this.menu.getBaseContext());
 		
 		this.setContentView(R.layout.main);
 		this.setTitle("Player Score");
@@ -28,8 +28,8 @@ public class SubmitScore extends Dialog {
 				
 				menu.ScoreMode = 0;
 				
-				DataHelper data = new DataHelper(getContext());
-				data.insert(editText.getEditableText().toString(), menu.gameSinglePlayer.getPlayerScore());
+				dataHelper = new DataHelper(getContext());
+				dataHelper.insert(editText.getEditableText().toString(), menu.gameSinglePlayer.getPlayerScore());
 				
 				Cursor cursor = dataHelper.select();
 				int x = 0;
@@ -44,7 +44,8 @@ public class SubmitScore extends Dialog {
 					vectorScore[x] = score;
 					x++;
 				}
-				
+				cursor.close();
+				dataHelper.close();
 				menu.LoadingScoreScreen();
 				menu.scoreScreen.ScoreScene(vectorPlayer,vectorScore);
 				menu.timePassed = menu.getEngine().getSecondsElapsedTotal();

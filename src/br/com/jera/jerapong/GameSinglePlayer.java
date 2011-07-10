@@ -2,23 +2,15 @@ package br.com.jera.jerapong;
 
 import java.text.NumberFormat;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import org.anddev.andengine.audio.sound.Sound;
 import org.anddev.andengine.engine.handler.timer.ITimerCallback;
 import org.anddev.andengine.engine.handler.timer.TimerHandler;
-import org.anddev.andengine.entity.modifier.AlphaModifier;
-import org.anddev.andengine.entity.modifier.ParallelEntityModifier;
-import org.anddev.andengine.entity.modifier.ScaleModifier;
-import org.anddev.andengine.entity.modifier.SequenceEntityModifier;
 import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.CameraScene;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.shape.Shape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
-import org.anddev.andengine.entity.text.Text;
-import org.anddev.andengine.entity.text.TickerText;
 import org.anddev.andengine.extension.physics.box2d.FixedStepPhysicsWorld;
 import org.anddev.andengine.extension.physics.box2d.PhysicsConnector;
 import org.anddev.andengine.extension.physics.box2d.PhysicsFactory;
@@ -27,7 +19,6 @@ import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
-import org.anddev.andengine.util.HorizontalAlign;
 
 import android.util.Log;
 
@@ -96,6 +87,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private Font fontScore;
 	private Font fontVictory;
 	private ChangeableText timePlaying;
+	
+	Sprite buttonPauseContinue; 
 
 	private Runnable runBall;
 
@@ -131,7 +124,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
 
-		this.physicWorld = new FixedStepPhysicsWorld(30,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
+		this.physicWorld = new FixedStepPhysicsWorld(50,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
 		this.PTM_RATIO = PhysicsConnector.PIXEL_TO_METER_RATIO_DEFAULT;
 
@@ -261,29 +254,15 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		Body bodyContact2 = contact.getFixtureB().getBody();
 		if (bodyContact1.equals(bodyBall) || bodyContact2.equals(bodyBall)) {
 			if (bodyContact1.equals(bodyBarRight) || bodyContact2.equals(bodyBarRight)) {
-
 				removeBall = true;
 				timePlaying.setVisible(false);
-				//final Scene scene = menuScreen.getEngine().getScene();
 				NumberFormat tp = NumberFormat.getInstance();
 				tp.setMinimumIntegerDigits(1);
 				tp.setMaximumIntegerDigits(10);
 
 				tp.setMinimumFractionDigits(1);
 				tp.setMaximumFractionDigits(1);
-				//final String textVictory = new String("Your time: " + tp.format(GameSinglePlayer.this.tempo).toString() + " s");
-				/*final Text text = new TickerText((CAMERA_WIDTH / 2) - (textVictory.length() / 2) * 17,(CAMERA_HEIGHT / 2) - 30, this.fontVictory,textVictory, HorizontalAlign.CENTER, 10);
-				text.registerEntityModifier(
-						new SequenceEntityModifier(
-								new ParallelEntityModifier(
-										new AlphaModifier(2, 0.0f, 1.0f),
-										new ScaleModifier(2, 0.5f, 1.5f)
-								)									
-						)
-				);
-				text.setBlendFunction(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-				scene.attachChild(text);*/
-				
+			
 				this.playerScore  = (tp.format(GameSinglePlayer.this.tempo).toString());
 				
 				// here dialog input text
@@ -342,13 +321,13 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 			speedY = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.y;
 			refreshVelocity = true;
 		}
-		if (Math.abs(speedBall.x) < MINIMUM_BALL_SPEED) {
+		if (Math.abs(speedBall.y) < MINIMUM_BALL_SPEED) {
 			if (speedBall.x < 0) {
-				speedX = speedBall.x - MINIMUM_BALL_SPEED;
+				speedY = speedBall.y - MINIMUM_BALL_SPEED;
 			} else {
-				speedX = speedBall.x + MINIMUM_BALL_SPEED;
+				speedY = speedBall.y + MINIMUM_BALL_SPEED;
 			}
-			speedY = speedBall.y;
+			if(!refreshVelocity) speedX = speedBall.x;
 			refreshVelocity = true;
 		}
 		menuScreen.runOnUpdateThread(new Runnable() {
@@ -440,6 +419,10 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	public void GameMenu(){
 		if(menuScreen.gameRunning){
+			//menuScreen.gameRunning = false;
+			/*if(pauseGameScene.getChildCount() == 4){
+				pauseGameScene.attachChild(buttonPauseContinue);
+			}*/			
 			scene.setChildScene(this.pauseGameScene, false, true, true);
 		}
 	}
@@ -465,7 +448,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		hCameraV = CAMERA_HEIGHT / 2;
 		posX = hCameraH - middleTextureRegionHorizontalSizeByTwo(textureRegionPauseContinue);
 		posY = hCameraV - this.textureRegionPauseContinue.getHeight() - middleTextureRegionVerticalSizeByTwo(textureRegionPauseContinue) - 15;
-		final Sprite buttonPauseContinue = new Sprite(posX,posY,textureRegionPauseContinue){
+		buttonPauseContinue = new Sprite(posX,posY,textureRegionPauseContinue){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 				scene.clearChildScene();
 				return false;
@@ -487,10 +470,10 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 					public void run() {
 						bodyBall.setTransform((CAMERA_WIDTH / 2)
 								/ PTM_RATIO, (CAMERA_HEIGHT / 2)
-								/ PTM_RATIO, 0f);	
+								/ PTM_RATIO, 0f);
 						bodyBall.setLinearVelocity(-10, 17);
 					}
-				});				
+				});
 				return false;
 			};
 		};

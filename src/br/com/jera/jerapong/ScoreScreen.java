@@ -9,6 +9,8 @@ import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.util.HorizontalAlign;
 
+import android.util.Log;
+
 public class ScoreScreen {
 
 	/** ######## GLOBAL ######## **/
@@ -74,6 +76,7 @@ public class ScoreScreen {
 			this.scene.attachChild(score);
 			
 			height += 60;
+			Log.e("childs no."," " + scene.getChildCount());
 			
 		}
 		
