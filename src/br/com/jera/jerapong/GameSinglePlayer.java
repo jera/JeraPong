@@ -265,6 +265,13 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 			
 				this.playerScore  = (tp.format(GameSinglePlayer.this.tempo).toString());
 				
+				menuScreen.gameRunning = false;
+				
+				if(pauseGameScene.getChildCount() == 5){
+					pauseGameScene.detachChild(buttonPauseContinue);
+				}				
+				scene.setChildScene(this.pauseGameScene, false, true, true);				
+				
 				// here dialog input text
 				menuScreen.runOnUiThread(new Runnable() {
 					@Override
@@ -419,10 +426,10 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	public void GameMenu(){
 		if(menuScreen.gameRunning){
-			//menuScreen.gameRunning = false;
-			/*if(pauseGameScene.getChildCount() == 4){
+			menuScreen.gameRunning = false;
+			if(pauseGameScene.getChildCount() == 4){
 				pauseGameScene.attachChild(buttonPauseContinue);
-			}*/			
+			}			
 			scene.setChildScene(this.pauseGameScene, false, true, true);
 		}
 	}
@@ -450,6 +457,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		posY = hCameraV - this.textureRegionPauseContinue.getHeight() - middleTextureRegionVerticalSizeByTwo(textureRegionPauseContinue) - 15;
 		buttonPauseContinue = new Sprite(posX,posY,textureRegionPauseContinue){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				menuScreen.gameRunning = true;
 				scene.clearChildScene();
 				return false;
 			};
@@ -464,6 +472,9 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		posY = hCameraV - middleTextureRegionVerticalSizeByTwo(textureRegionPauseNewGame);
 		final Sprite buttonPauseNewGame = new Sprite(posX,posY,textureRegionPauseNewGame){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				menuScreen.gameRunning = true;
+				timePlaying.setVisible(true);
+				menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal(); 
 				scene.clearChildScene();				
 				menuScreen.runOnUpdateThread(new Runnable() {
 					@Override
