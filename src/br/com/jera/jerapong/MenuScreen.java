@@ -11,7 +11,6 @@ import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolic
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.sprite.Sprite;
-import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
 import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
@@ -43,7 +42,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public GameSinglePlayer gameSinglePlayer;
 	public ScoreScreen scoreScreen;
 	public static String choiceMap;
-	private DataHelper dataHelper;
 	public int sound = 1;
 	public int ScoreMode = 0;
 	
