@@ -184,6 +184,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		 */
 		this.spriteSinglePlayer = new Sprite(widthSinglePlayer, heightSinglePlayer, this.textureRegionSinglePlayer){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				//Toast.makeText(getBaseContext(), "Loading single player...", 100).show();
 				SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
 				modeSelected = 1;
 				dialog.show();
@@ -197,7 +198,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		 * Loading multi player button resources
 		 */
 		this.spriteMultiPlayer = new Sprite(widthMultiPlayer, heightMultiPlayer, this.textureRegionMultiPlayer){
-			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {				
+			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 				//Toast.makeText(getBaseContext(), "Loading single player...", 100).show();
 				SelectMapDialog dialog = new SelectMapDialog(MenuScreen.this);
 				modeSelected = 2;

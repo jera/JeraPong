@@ -37,6 +37,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private int CAMERA_HEIGHT;
 	private float PTM_RATIO;
 	public static final int SUBMIT_DIALOG = 666;
+	public static final int SELECT_MAP = 6;
 	private String playerScore;
 
 	private MenuScreen menuScreen;

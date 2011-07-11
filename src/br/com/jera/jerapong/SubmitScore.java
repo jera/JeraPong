@@ -8,7 +8,6 @@ import android.widget.EditText;
 
 public class SubmitScore extends Dialog {
 
-	public static final int SELECT_MAP = 666;
 	private MenuScreen menu;
 	private DataHelper dataHelper;
 	
