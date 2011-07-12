@@ -2,6 +2,7 @@ package br.com.jera.jerapong;
 
 import android.app.Dialog;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +16,6 @@ public class SubmitScore extends Dialog {
 	public SubmitScore(final MenuScreen menu) {
 		super(menu);
 		this.menu = (MenuScreen) menu;
-		dataHelper = new DataHelper(this.menu.getBaseContext());
 		
 		this.setContentView(R.layout.main);
 		this.setTitle("Player Score");
@@ -28,10 +28,11 @@ public class SubmitScore extends Dialog {
 				
 				menu.ScoreMode = 0;
 				
-				dataHelper = new DataHelper(getContext());
+				dataHelper = new DataHelper(menu.getBaseContext());
 				dataHelper.insert(editText.getEditableText().toString(), menu.gameSinglePlayer.getPlayerScore());
 				
 				Cursor cursor = dataHelper.select();
+				
 				int x = 0;
 				String[] vectorPlayer = new String[5];
 				double[] vectorScore = new double[5];
@@ -44,12 +45,13 @@ public class SubmitScore extends Dialog {
 					vectorScore[x] = score;
 					x++;
 				}
+				
 				cursor.close();
 				dataHelper.close();
+				
 				menu.LoadingScoreScreen();
 				menu.scoreScreen.ScoreScene(vectorPlayer,vectorScore);
 				menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
-				
 				dismiss();
 			}
 		});

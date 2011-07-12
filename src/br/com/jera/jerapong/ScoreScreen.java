@@ -26,6 +26,7 @@ public class ScoreScreen {
 	private Texture textureFontScore;
 	private Texture textureBtnBack;
 	private Texture textureBtnNewGame;
+	private DataHelper data;
 	
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionBtnBack;
@@ -76,7 +77,6 @@ public class ScoreScreen {
 			this.scene.attachChild(score);
 			
 			height += 60;
-			Log.e("childs no."," " + scene.getChildCount());
 			
 		}
 		
@@ -109,7 +109,6 @@ public class ScoreScreen {
 		};
 		scene.attachChild(this.spriteBtnBack);
 		scene.registerTouchArea(this.spriteBtnBack);
-		
 		
 		menuScreen.getEngine().setScene(this.scene);
 	}

@@ -3,6 +3,8 @@ package br.com.jera.jerapong;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.anddev.andengine.entity.scene.Scene;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.util.Log;
@@ -34,17 +36,21 @@ public class SelectMapDialog extends Dialog {
 				button.setImageResource(activity.getApplicationContext().getResources().getIdentifier(currentMap + "_thumb", "drawable", "br.com.jera.jerapong"));
 				button.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
+						
 						if(menu.modeSelected == 1){
-							menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
-							menu.gameRunning = true;
-							menu.LoadingGameSinglePlayer(currentMap);							
-							menu.gameSinglePlayer.GameScene();
+								menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
+								menu.gameRunning = true;
+								
+								menu.LoadingGameSinglePlayer(currentMap);							
+								menu.gameSinglePlayer.GameScene();
+								menu.LoadingGameSinglePlayer = true;
 						}
 						else{
-							menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
-							menu.gameRunning = true;
-							menu.LoadingGameMultiPlayer(currentMap);
-							menu.gameMultiPlayer.GameScene();
+								menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
+								menu.gameRunning = true;
+								menu.LoadingGameMultiPlayer(currentMap);
+								menu.gameMultiPlayer.GameScene();
+								menu.LoadingGameSinglePlayer = true;
 						}
 						dismiss();
 					}

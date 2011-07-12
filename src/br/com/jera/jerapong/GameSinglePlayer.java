@@ -38,6 +38,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private float PTM_RATIO;
 	public static final int SUBMIT_DIALOG = 666;
 	private String playerScore;
+	private DataHelper data;
 
 	private MenuScreen menuScreen;
 
@@ -119,11 +120,13 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	}
 
 	public void GameScene() {
-		CreateGameMenu();
-
+		
 		scene = new Scene(2);
+		
 		scene.setOnAreaTouchTraversalFrontToBack();
-
+		
+		CreateGameMenu();
+		
 		this.physicWorld = new FixedStepPhysicsWorld(50,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
 		this.PTM_RATIO = PhysicsConnector.PIXEL_TO_METER_RATIO_DEFAULT;
