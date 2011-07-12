@@ -4,7 +4,7 @@
 	android:background="@drawable/selectmap_bg"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-	android:layout_height="380dip">
+	android:layout_height="fill_parent">
 	<LinearLayout
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
