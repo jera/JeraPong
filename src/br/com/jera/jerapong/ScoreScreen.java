@@ -9,8 +9,6 @@ import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.util.HorizontalAlign;
 
-import android.util.Log;
-
 public class ScoreScreen {
 
 	/** ######## GLOBAL ######## **/
@@ -26,7 +24,6 @@ public class ScoreScreen {
 	private Texture textureFontScore;
 	private Texture textureBtnBack;
 	private Texture textureBtnNewGame;
-	private DataHelper data;
 	
 	private TextureRegion textureRegionBackground;
 	private TextureRegion textureRegionBtnBack;
@@ -61,7 +58,7 @@ public class ScoreScreen {
 		this.scene.attachChild(background);
 		
 		/** Background */
-		int height = (CAMERA_HEIGHT - CAMERA_HEIGHT) + 100;
+		int height = (CAMERA_HEIGHT - CAMERA_HEIGHT) + 200;
 		/** Table for ranking */
 		for(int x = 0; 5 > x; x++){
 			

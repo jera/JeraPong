@@ -334,7 +334,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 			this.gameSinglePlayer.setTextureRegionPauseMainMenu(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePauseMainMenu(), this, "gfx/pause/button_main_menu.png", 0, 0));
 			this.gameSinglePlayer.setFontScore(new Font(this.gameSinglePlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
 			this.gameSinglePlayer.setFontVictory(new Font(this.gameSinglePlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
-			this.gameSinglePlayer.setFontReadySetGo(new Font(this.gameSinglePlayer.getTextureReadySetGo(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.RED));
+			this.gameSinglePlayer.setFontReadySetGo(new Font(this.gameSinglePlayer.getTextureReadySetGo(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.BLACK));
 	
 			
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePlayer1());
@@ -402,7 +402,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		
 		this.gameMultiPlayer.setFontScore(new Font(this.gameMultiPlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
 		this.gameMultiPlayer.setFontVictory(new Font(this.gameMultiPlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
-		this.gameMultiPlayer.setFontReadySetGo(new Font(this.gameMultiPlayer.getTextureReadySetGo(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.RED));
+		this.gameMultiPlayer.setFontReadySetGo(new Font(this.gameMultiPlayer.getTextureReadySetGo(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.BLACK));
 
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBackground());
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer1());

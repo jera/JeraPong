@@ -81,7 +81,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	private TextureRegion textureRegionLoose;
 
 	private PhysicsWorld physicWorld;
-	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.2f, 0f);
+	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.14f, 0f);
 	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(1f, 1f, 0f); //densidade,restituição,frição
 
 	private Sprite spritePlayer1;
@@ -133,6 +133,18 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	public Sound finalSound;
 	boolean finalGameSound = false;
 	int timerReadySetGo;
+	
+	private Runnable initialBallVelocityLeft;
+	private Runnable initialBallVelocityRight;
+	private Runnable movePlayer1;
+	private Runnable movePlayer2;
+	private Runnable playFinalGameSound;
+	private Runnable removeResetBall;
+	private Runnable refreshLinearVelocity;
+	private Runnable initialBallPosition;
+	
+	Vector2 newPositionPlayer1 = new Vector2();
+	Vector2 newPositionPlayer2 = new Vector2();
 
 
 	/** ######## GAME ######## **/
@@ -186,7 +198,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 
 		scorePlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontScore,"0","0".length());
 		scorePlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontScore,"0","0".length());
-		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 40,(CAMERA_HEIGHT / 2) - 30,this.fontReadySetGo,"Tap","Tap".length());
+		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 32,(CAMERA_HEIGHT / 2) - 25,this.fontReadySetGo,"Tap","Tap".length());
 		//readySetGo.setPosition(HALF_CAMERA_WIDTH - readySetGo.getWidth() / 2,HALF_CAMERA_HEIGHT - readySetGo.getHeight() / 2);
 		//readySetGo.setVisible(false);
 
@@ -232,9 +244,9 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 						touchY = minimumPosY;
 					if (touchY > maximumPosY)
 						touchY = maximumPosY;
-					Vector2 newPosition = new Vector2(
-							bodyPlayer1.getPosition().x, touchY / PTM_RATIO);
-					bodyPlayer1.setTransform(newPosition, 0);
+					newPositionPlayer1.x = bodyPlayer1.getPosition().x;
+					newPositionPlayer1.y = touchY / PTM_RATIO;
+					menuScreen.runOnUpdateThread(movePlayer1());
 					break;
 				}
 				return true;
@@ -261,8 +273,9 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				case TouchEvent.ACTION_MOVE:
 					if(touchY < minimumPosY) touchY = minimumPosY;
 					if(touchY > maximumPosY) touchY = maximumPosY;
-					Vector2 newPosition = new Vector2(bodyPlayer2.getPosition().x, touchY / PTM_RATIO);
-					bodyPlayer2.setTransform(newPosition, 0);
+					newPositionPlayer2.x = bodyPlayer2.getPosition().x;
+					newPositionPlayer2.y = touchY / PTM_RATIO;
+					menuScreen.runOnUpdateThread(movePlayer2());
 					break;
 				}
 				return true;
@@ -280,9 +293,11 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 					readySetGo.setVisible(false);
 					if(playerTime == 1){
-						bodyBall.setLinearVelocity(-8,12);
+						menuScreen.runOnUpdateThread(initialBallVelocityLeft());
+						//bodyBall.setLinearVelocity(-8,12);
 					}else{
-						bodyBall.setLinearVelocity(8,12);
+						menuScreen.runOnUpdateThread(initialBallVelocityRight());
+						//bodyBall.setLinearVelocity(8,12);
 					}
 					activeBall = true;
 				return false;
@@ -299,6 +314,54 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		menuScreen.getEngine().setScene(scene);
 
 		Log.e("scene game", "OK");
+	}
+	
+	private Runnable movePlayer1(){
+		if(movePlayer1 == null){
+			this.movePlayer1 = new Runnable(){
+				@Override
+				public void run(){
+					bodyPlayer1.setTransform(newPositionPlayer1, 0);
+				}
+			};
+		}
+		return this.movePlayer1;
+	}
+	
+	private Runnable movePlayer2(){
+		if(movePlayer2 == null){
+			this.movePlayer2 = new Runnable(){
+				@Override
+				public void run(){
+					bodyPlayer2.setTransform(newPositionPlayer2, 0);
+				}
+			};
+		}
+		return this.movePlayer2;
+	}
+	
+	private Runnable initialBallVelocityLeft(){
+		if(initialBallVelocityLeft == null){
+			this.initialBallVelocityLeft = new Runnable(){
+				@Override
+				public void run(){
+					bodyBall.setLinearVelocity(-17,15);
+				}
+			};
+		}
+		return this.initialBallVelocityLeft;
+	}
+	
+	private Runnable initialBallVelocityRight(){
+		if(initialBallVelocityRight == null){
+			this.initialBallVelocityRight = new Runnable(){
+				@Override
+				public void run(){
+					bodyBall.setLinearVelocity(-17,15);
+				}
+			};
+		}
+		return this.initialBallVelocityRight;
 	}
 
 	@Override
@@ -368,28 +431,46 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				pingSound.play();
 			}
 		}		
-		menuScreen.runOnUpdateThread(new Runnable() {
-			@Override
-			public void run() {				
-				if(finalGameSound){
-					if(menuScreen.sound == 1){
-						finalSound.play();
-						finalGameSound = false;
+		menuScreen.runOnUpdateThread(removeResetBall());
+		menuScreen.runOnUpdateThread(playFinalGameSound());
+	}
+	
+	public Runnable playFinalGameSound(){
+		if(playFinalGameSound == null){
+			playFinalGameSound = new Runnable(){
+				@Override
+				public void run(){
+					if(finalGameSound){
+						if(menuScreen.sound == 1){
+							finalSound.play();
+							finalGameSound = false;
+						}
 					}
 				}
-				if(removeBall){
-					activeBall = false;
-					bodyBall.setTransform((CAMERA_WIDTH / PTM_RATIO) + 10,(CAMERA_HEIGHT / PTM_RATIO) + 10, 0);
-					bodyBall.setLinearVelocity(0f,0f);
-					removeBall = false;
-					if(resetBall){
-						bodyBall.setTransform(HALF_CAMERA_WIDTH / PTM_RATIO, HALF_CAMERA_HEIGHT / PTM_RATIO,0);
-						resetBall = false;
+			};
+		}
+		return this.playFinalGameSound;
+	}
+	
+	public Runnable removeResetBall(){
+		if(removeResetBall == null){
+			removeResetBall = new Runnable(){
+				@Override
+				public void run(){
+					if(removeBall){
+						activeBall = false;
+						bodyBall.setTransform((CAMERA_WIDTH / PTM_RATIO) + 10,(CAMERA_HEIGHT / PTM_RATIO) + 10, 0);
+						bodyBall.setLinearVelocity(0f,0f);
+						removeBall = false;
+						if(resetBall){
+							bodyBall.setTransform(HALF_CAMERA_WIDTH / PTM_RATIO, HALF_CAMERA_HEIGHT / PTM_RATIO,0);
+							resetBall = false;
+						}
 					}
-				}				
-			}
-		});
-
+				}
+			};
+		}
+		return this.removeResetBall;
 	}
 
 	@Override
@@ -410,61 +491,27 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 			if(!refreshVelocity) speedX = speedBall.x;
 			refreshVelocity = true;
 		}*/
-		menuScreen.runOnUpdateThread(new Runnable() {
-			@Override
-			public void run() {
-				if(refreshVelocity){
-					if(activeBall){
-						bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
-						refreshVelocity = false;
-					}
-				}
-			}
-		});
+		menuScreen.runOnUpdateThread(refreshLinearVelocity());
 
 	}
-
-	/*public void ballInitialPosition(){		
-		readySetGo.setText("Ready");
-		readySetGo.setVisible(true);
-		timerReadySetGo = 1;
-		scene.registerUpdateHandler(new TimerHandler(1f, true,new ITimerCallback() {
-			@Override
-			public void onTimePassed(final TimerHandler pTimerHandler) {
-				if(timerReadySetGo == 1){
-					readySetGo.setText("Set");
-					timerReadySetGo++;
-				}else if(timerReadySetGo == 2){
-					timerReadySetGo = 5;					
-					readySetGo.setText("Go!");
-					menuScreen.runOnUpdateThread(timerResetBall());					
-					//scene.registerUpdateHandler(new TimerHandler(0.5f, false,new ITimerCallback() {
-					//	@Override
-					//	public void onTimePassed(final TimerHandler pTimerHandler) {
-					//		readySetGo.setVisible(false);
-					//	}
-					//}));
-				}
-			}
-		}));		
-	}
-
-	private Runnable timerResetBall() {
-		if (timerResetBall == null) {
-			this.timerResetBall = new Runnable() {
+	
+	public Runnable refreshLinearVelocity(){
+		if(refreshLinearVelocity == null){
+			refreshLinearVelocity = new Runnable(){
 				@Override
-				public void run() {
-					if(playerTime == 1){
-						bodyBall.setLinearVelocity(10,15);
-					}else{
-						bodyBall.setLinearVelocity(-10,15);
+				public void run(){
+					if(refreshVelocity){
+						if(activeBall){
+							bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
+							refreshVelocity = false;
+						}
 					}
-					activeBall = true;
 				}
 			};
 		}
-		return this.timerResetBall;
-	}*/
+		return this.refreshLinearVelocity;
+	}
+
 
 	@Override
 	public void preSolve(Contact pContact) {
@@ -537,15 +584,8 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				pointsPlayer2 = 0;
 				scorePlayer1.setText("0");
 				scorePlayer2.setText("0");
-				menuScreen.runOnUpdateThread(new Runnable() {
-					@Override
-					public void run() {
-						bodyBall.setTransform((CAMERA_WIDTH / 2)
-								/ PTM_RATIO, (CAMERA_HEIGHT / 2)
-								/ PTM_RATIO, 0f);	
-						bodyBall.setLinearVelocity(-10, 17);
-					}
-				});				
+				readySetGo.setVisible(true);
+				menuScreen.runOnUpdateThread(initialBallPosition());			
 				return false;
 			};
 		};
@@ -569,6 +609,18 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 
 		this.pauseGameScene.setBackgroundEnabled(false);
 		this.pauseGameScene.setTouchAreaBindingEnabled(true);
+	}
+	
+	public Runnable initialBallPosition(){
+		if(initialBallPosition == null){
+			initialBallPosition = new Runnable(){
+				@Override
+				public void run(){
+					bodyBall.setTransform(HALF_CAMERA_WIDTH / PTM_RATIO, HALF_CAMERA_HEIGHT / PTM_RATIO, 0f);					
+				}
+			};
+		}
+		return this.initialBallPosition;
 	}
 
 	public void CreateEndGameMenu(int winner){

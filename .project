@@ -3,6 +3,7 @@
 	<name>JPong</name>
 	<comment></comment>
 	<projects>
+		<project>Android-Util</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

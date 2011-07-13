@@ -35,11 +35,12 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	private int CAMERA_WIDTH;
 	private int CAMERA_HEIGHT;
+	private int HALF_CAMERA_WIDTH;
+	private int HALF_CAMERA_HEIGHT;
 	private float PTM_RATIO;
 	public static final int SUBMIT_DIALOG = 666;
 	public static final int SELECT_MAP = 6;
 	private String playerScore;
-	private DataHelper data;
 
 	private MenuScreen menuScreen;
 
@@ -74,7 +75,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private TextureRegion textureRegionPauseMainMenu;
 	
 	private PhysicsWorld physicWorld;
-	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.2f, 0f);
+	private static final FixtureDef FIXTURE_PLAYERS = PhysicsFactory.createFixtureDef(10f, 1.14f, 0f);
 	private static final FixtureDef FIXTURE_BALL = PhysicsFactory.createFixtureDef(1f, 1f, 0f); // densidade,restituição,frição
 
 	private Sprite spritePlayer1;
@@ -96,6 +97,11 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	Sprite buttonPauseContinue; 
 
 	private Runnable runBall;
+	private Runnable dialogSubmit;
+	private Runnable initialBallVelocityLeft;
+	private Runnable movePlayer1;
+	private Runnable refreshLinearVelocity;
+	private Runnable initialBallPosition;
 
 	final float MAXIMUM_BALL_SPEED = 85f;
 	final float MINIMUM_BALL_SPEED = 15f;
@@ -117,6 +123,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private CameraScene pauseGameScene;	
 	public String choiceMap;
 
+	Vector2 newPositionPlayer1 = new Vector2();
 
 	/** ######## GAME ######## **/
 
@@ -125,6 +132,9 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	}
 
 	public void GameScene() {
+		
+		HALF_CAMERA_WIDTH = CAMERA_WIDTH / 2;
+		HALF_CAMERA_HEIGHT = CAMERA_HEIGHT / 2;
 		
 		Log.e("scene game", "loading");
 		
@@ -225,9 +235,9 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 						touchY = minimumPosY;
 					if (touchY > maximumPosY)
 						touchY = maximumPosY;
-					Vector2 newPosition = new Vector2(
-							bodyPlayer1.getPosition().x, touchY / PTM_RATIO);
-					bodyPlayer1.setTransform(newPosition, 0);
+					newPositionPlayer1.x = bodyPlayer1.getPosition().x;
+					newPositionPlayer1.y = touchY / PTM_RATIO;
+					menuScreen.runOnUpdateThread(movePlayer1());
 					break;
 				}
 				return true;
@@ -244,7 +254,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 					readySetGo.setVisible(false);
 					menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
-					bodyBall.setLinearVelocity(-17,15);
+					menuScreen.runOnUpdateThread(initialBallVelocityLeft());
 					activeBall = true;
 				return false;
 			}
@@ -254,7 +264,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		scene.attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
 		
-		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 40,(CAMERA_HEIGHT / 2) - 30,this.fontReadySetGo,"Tap","Tap".length());
+		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 32,(CAMERA_HEIGHT / 2) - 25,this.fontReadySetGo,"Tap","Tap".length());
 		scene.attachChild(readySetGo);
 		
 		scene.setTouchAreaBindingEnabled(true);
@@ -262,6 +272,42 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		
 		Log.e("scene game", "OK");
 	}
+	
+	private Runnable movePlayer1(){
+		if(movePlayer1 == null){
+			this.movePlayer1 = new Runnable(){
+				@Override
+				public void run(){
+					bodyPlayer1.setTransform(newPositionPlayer1, 0);
+				}
+			};
+		}
+		return this.movePlayer1;
+	}
+	
+	private Runnable initialBallVelocityLeft(){
+		if(initialBallVelocityLeft == null){
+			this.initialBallVelocityLeft = new Runnable(){
+				@Override
+				public void run(){
+					bodyBall.setLinearVelocity(-17,15);
+				}
+			};
+		}
+		return this.initialBallVelocityLeft;
+	}
+	
+	/*private Runnable initialBallVelocityRight(){
+		if(initialBallVelocityRight == null){
+			this.initialBallVelocityRight = new Runnable(){
+				@Override
+				public void run(){
+					bodyBall.setLinearVelocity(-17,15);
+				}
+			};
+		}
+		return this.initialBallVelocityRight;
+	}*/
 
 	@Override
 	public void beginContact(Contact contact) {
@@ -291,12 +337,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				}
 				
 				// here dialog input text
-				menuScreen.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						menuScreen.showDialog(SUBMIT_DIALOG);
-					}
-				});				
+				menuScreen.runOnUiThread(dialogSubmit());				
 			}
 			else{
 				if(menuScreen.sound == 1){
@@ -306,6 +347,18 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		}		
 		menuScreen.runOnUpdateThread(runBall());
 
+	}
+	
+	private Runnable dialogSubmit(){
+		if(dialogSubmit == null){
+			this.dialogSubmit = new Runnable(){
+				@Override
+				public void run(){
+					menuScreen.showDialog(SUBMIT_DIALOG);
+				}
+			};
+		}
+		return this.dialogSubmit;
 	}
 
 	private Runnable runBall() {
@@ -346,29 +399,34 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 			speedY = (MAXIMUM_BALL_SPEED / speedBall.len()) * speedBall.y;
 			refreshVelocity = true;
 		}
-		if (Math.abs(speedBall.y) < MINIMUM_BALL_SPEED) {
-			if (speedBall.x < 0) {
+		/*if (Math.abs(speedBall.y) < MINIMUM_BALL_SPEED) {
+			if (speedBall.y < 0) {
 				speedY = speedBall.y - MINIMUM_BALL_SPEED;
 			} else {
 				speedY = speedBall.y + MINIMUM_BALL_SPEED;
 			}
 			if(!refreshVelocity) speedX = speedBall.x;
 			refreshVelocity = true;
-		}
-		menuScreen.runOnUpdateThread(new Runnable() {
-			@Override
-			public void run() {
-				if (refreshVelocity) {
-					if (activeBall) {
-						bodyBall.setLinearVelocity(new Vector2(speedX, speedY));
-						refreshVelocity = false;
-					}
-				}
-			}
-		});
-
+		}*/
+		menuScreen.runOnUpdateThread(refreshLinearVelocity());
 	}
 
+	public Runnable refreshLinearVelocity(){
+		if(refreshLinearVelocity == null){
+			refreshLinearVelocity = new Runnable(){
+				@Override
+				public void run(){
+					if(refreshVelocity){
+						if(activeBall){
+							bodyBall.setLinearVelocity(new Vector2(speedX,speedY));
+							refreshVelocity = false;
+						}
+					}
+				}
+			};
+		}
+		return this.refreshLinearVelocity;
+	}
 
 
 	@Override
@@ -498,15 +556,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				timePlaying.setVisible(true);
 				menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal(); 
 				scene.clearChildScene();				
-				menuScreen.runOnUpdateThread(new Runnable() {
-					@Override
-					public void run() {
-						bodyBall.setTransform((CAMERA_WIDTH / 2)
-								/ PTM_RATIO, (CAMERA_HEIGHT / 2)
-								/ PTM_RATIO, 0f);
-						bodyBall.setLinearVelocity(-10, 17);
-					}
-				});
+				readySetGo.setVisible(true);
+				menuScreen.runOnUpdateThread(initialBallPosition());
 				return false;
 			};
 		};
@@ -530,6 +581,18 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 		this.pauseGameScene.setBackgroundEnabled(false);
 		this.pauseGameScene.setTouchAreaBindingEnabled(true);
+	}
+	
+	public Runnable initialBallPosition(){
+		if(initialBallPosition == null){
+			initialBallPosition = new Runnable(){
+				@Override
+				public void run(){
+					bodyBall.setTransform(HALF_CAMERA_WIDTH / PTM_RATIO, HALF_CAMERA_HEIGHT / PTM_RATIO, 0f);					
+				}
+			};
+		}
+		return this.initialBallPosition;
 	}
 
 	public int middleTextureRegionHorizontalSizeByTwo(TextureRegion tr){
