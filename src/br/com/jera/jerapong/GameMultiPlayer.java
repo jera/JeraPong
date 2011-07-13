@@ -1,8 +1,6 @@
 package br.com.jera.jerapong;
 
 import org.anddev.andengine.audio.sound.Sound;
-import org.anddev.andengine.engine.handler.timer.ITimerCallback;
-import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.entity.modifier.ColorModifier;
 import org.anddev.andengine.entity.modifier.ParallelEntityModifier;
 import org.anddev.andengine.entity.modifier.ScaleModifier;
@@ -188,7 +186,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 
 		scorePlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontScore,"0","0".length());
 		scorePlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontScore,"0","0".length());
-		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 40,(CAMERA_HEIGHT / 2) - 40,this.fontReadySetGo,"Tap","Tap".length());
+		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 40,(CAMERA_HEIGHT / 2) - 30,this.fontReadySetGo,"Tap","Tap".length());
 		//readySetGo.setPosition(HALF_CAMERA_WIDTH - readySetGo.getWidth() / 2,HALF_CAMERA_HEIGHT - readySetGo.getHeight() / 2);
 		//readySetGo.setVisible(false);
 
@@ -315,11 +313,11 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				this.scorePlayer2.registerEntityModifier(
 						new SequenceEntityModifier(
 								new ParallelEntityModifier(
-										new ScaleModifier(0.3f,1,1.5f),
+										new ScaleModifier(0.3f,1,4f),
 										new ColorModifier(0.3f,1,0,1,0,1,0)
 								),
 								new ParallelEntityModifier(
-										new ScaleModifier(0.3f,1.5f,1),
+										new ScaleModifier(0.3f,4f,1),
 										new ColorModifier(0.3f,0,1,0,1,0,1)
 								)
 						)
@@ -343,11 +341,11 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 				this.scorePlayer1.registerEntityModifier(
 						new SequenceEntityModifier(
 							new ParallelEntityModifier(
-								new ScaleModifier(0.3f,1,1.5f),
+								new ScaleModifier(0.3f,1,4f),
 								new ColorModifier(0.3f,1,0,1,0,1,0)
 							),
 							new ParallelEntityModifier(
-								new ScaleModifier(0.3f,1.5f,1),
+								new ScaleModifier(0.3f,4f,1),
 								new ColorModifier(0.3f,0,1,0,1,0,1)
 							)
 						)

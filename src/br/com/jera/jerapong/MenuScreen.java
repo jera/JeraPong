@@ -7,7 +7,7 @@ import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
-import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.anddev.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.sprite.Sprite;
@@ -39,7 +39,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	/** ######## GLOBAL ######## **/
 	
 	private int CAMERA_WIDTH = 0;
-	private int count = 0;
 	private int CAMERA_HEIGHT = 0;	
 	public GameMultiPlayer gameMultiPlayer;
 	public GameSinglePlayer gameSinglePlayer;
@@ -100,7 +99,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		Log.e("height","" + CAMERA_HEIGHT);
 		v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		final EngineOptions engineOptions = new EngineOptions(true,ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera).setNeedsSound(true);
+		final EngineOptions engineOptions = new EngineOptions(true,ScreenOrientation.LANDSCAPE, new FillResolutionPolicy(), camera).setNeedsSound(true);
 		final Engine engine = new Engine(engineOptions);
 		try {
 			if (MultiTouch.isSupported(this)) {
@@ -315,6 +314,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 			this.gameSinglePlayer.setTextureBall(new Texture(128,128,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 			this.gameSinglePlayer.setTextureScore(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 			this.gameSinglePlayer.setTextureVictory(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+			this.gameSinglePlayer.setTextureReadySetGo(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 			this.gameSinglePlayer.setTexturePause(new Texture(256,64,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 			this.gameSinglePlayer.setTextureBarRight(new Texture(128,1024,TextureOptions.DEFAULT));
 			this.gameSinglePlayer.setTextureBGScore(new Texture(256,128,TextureOptions.DEFAULT));
@@ -334,12 +334,14 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 			this.gameSinglePlayer.setTextureRegionPauseMainMenu(TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTexturePauseMainMenu(), this, "gfx/pause/button_main_menu.png", 0, 0));
 			this.gameSinglePlayer.setFontScore(new Font(this.gameSinglePlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
 			this.gameSinglePlayer.setFontVictory(new Font(this.gameSinglePlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
+			this.gameSinglePlayer.setFontReadySetGo(new Font(this.gameSinglePlayer.getTextureReadySetGo(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.RED));
 	
 			
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePlayer1());
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBall());
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureScore());
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureVictory());
+			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureReadySetGo());
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePause());
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBarRight());
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBGScore());
@@ -349,6 +351,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePauseMainMenu());
 			this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontScore());
 			this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontVictory());
+			this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontReadySetGo());
 				
 			try {
 				this.gameSinglePlayer.pingSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/ping.mp3");

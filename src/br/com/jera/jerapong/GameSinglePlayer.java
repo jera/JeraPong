@@ -50,6 +50,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	private Texture textureBall;
 	private Texture textureScore;
 	private Texture textureVictory;
+	private Texture textureReadySetGo;
 	private Texture texturePause;
 	private Texture textureBarRight;
 	private Texture textureMiddleLine;
@@ -88,7 +89,9 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	private Font fontScore;
 	private Font fontVictory;
+	private Font fontReadySetGo;
 	private ChangeableText timePlaying;
+	private ChangeableText readySetGo;
 	
 	Sprite buttonPauseContinue; 
 
@@ -239,6 +242,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
 				final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+					readySetGo.setVisible(false);
 					menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
 					bodyBall.setLinearVelocity(-17,15);
 					activeBall = true;
@@ -249,14 +253,9 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall, BodyType.DynamicBody, FIXTURE_BALL);
 		scene.attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
-		scene.registerUpdateHandler(new TimerHandler(5f, false,new ITimerCallback() {
-			@Override
-			public void onTimePassed(final TimerHandler pTimerHandler) {
-				/*menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
-				bodyBall.setLinearVelocity(-17,15);
-				activeBall = true;*/
-			}
-		}));		
+		
+		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 40,(CAMERA_HEIGHT / 2) - 30,this.fontReadySetGo,"Tap","Tap".length());
+		scene.attachChild(readySetGo);
 		
 		scene.setTouchAreaBindingEnabled(true);
 		menuScreen.getEngine().setScene(scene);
@@ -391,6 +390,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setTextureBall(Texture t) { this.textureBall = t; }
 	public void setTextureScore(Texture t) { this.textureScore = t; }
 	public void setTextureVictory(Texture t) {	this.textureVictory = t; }
+	public void setTextureReadySetGo(Texture t) { this.textureReadySetGo = t; }
 	public void setTexturePause(Texture t) { this.texturePause = t; }
 	public void setTextureBarRight(Texture t) { this.textureBarRight = t; }
 	public void setTextureMiddleLine(Texture t) { this.textureMiddleLine = t; }
@@ -412,13 +412,15 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public void setTextureRegionPauseMainMenu(TextureRegion tr) { this.textureRegionPauseMainMenu = tr; }	
 	public void setFontScore(Font fontScore) { this.fontScore = fontScore; }
 	public void setFontVictory(Font fontVictory) { this.fontVictory = fontVictory; }
-	public void setChoiceMap(String choiceMap) { this.choiceMap = choiceMap; }	
+	public void setChoiceMap(String choiceMap) { this.choiceMap = choiceMap; }
+	public void setFontReadySetGo(Font fontReadySetGo) { this.fontReadySetGo = fontReadySetGo; }
 
 	public Texture getTextureBackground() { return textureBackground; }	
 	public Texture getTexturePlayer1() { return texturePlayer1;	}	
 	public Texture getTextureBall() { return textureBall; }	
 	public Texture getTextureScore() { return textureScore; }	
 	public Texture getTextureVictory() { return textureVictory; }
+	public Texture getTextureReadySetGo() { return textureReadySetGo; }
 	public Texture getTexturePause() { return texturePause; }
 	public Texture getTextureBarRight() { return textureBarRight; }
 	public Texture getTextureMiddleLine() { return textureMiddleLine; }
@@ -426,7 +428,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public Texture getTextureBackgroundPause() { return textureBackgroundPause; }
 	public Texture getTexturePauseContinue() { return texturePauseContinue; }
 	public Texture getTexturePauseNewGame() { return texturePauseNewGame; }
-	public Texture getTexturePauseMainMenu() { return texturePauseMainMenu; }
+	public Texture getTexturePauseMainMenu() { return texturePauseMainMenu; }	
 
 	public TextureRegion getTextureRegionBackground() {	return textureRegionBackground; }	
 	public TextureRegion getTextureRegionPlayer1() { return textureRegionPlayer1; }
@@ -442,6 +444,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public Font getFontScore() { return fontScore; }	
 	public Font getFontVictory() { return fontVictory; }	
 	public String getChoiceMap() { return choiceMap; }
+	public Font getFontReadySetGo() { return fontReadySetGo; }
 
 	public void GameMenu(){
 		if(menuScreen.gameRunning){
