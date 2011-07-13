@@ -94,8 +94,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	private Runnable runBall;
 
-	final float MAXIMUM_BALL_SPEED = 40f;
-	final float MINIMUM_BALL_SPEED = 5f;
+	final float MAXIMUM_BALL_SPEED = 85f;
+	final float MINIMUM_BALL_SPEED = 15f;
 	final float WALL_WIDTH = 2;
 	float speedX = 0;
 	float speedY = 0;

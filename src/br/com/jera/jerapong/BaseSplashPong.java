@@ -6,6 +6,7 @@ import org.anddev.andengine.engine.handler.timer.ITimerCallback;
 import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
+import org.anddev.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.anddev.andengine.engine.options.resolutionpolicy.IResolutionPolicy;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.scene.Scene;
@@ -79,7 +80,7 @@ public abstract class BaseSplashPong extends BaseGameActivity {
 		final int height = getWindowManager().getDefaultDisplay().getHeight();
 		
 		this.mCamera = this.getSplashCamera(width, height);
-		return new Engine(new EngineOptions(true, this.getScreenOrientation(), this.getSplashResolutionPolicy(width, height), this.mCamera));
+		return new Engine(new EngineOptions(true, this.getScreenOrientation(), new FillResolutionPolicy(), this.mCamera));
 	}
 
 	@Override

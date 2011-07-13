@@ -115,8 +115,8 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	private ChangeableText scorePlayer2;
 	private ChangeableText readySetGo;
 
-	final float MAXIMUM_BALL_SPEED = 40f;
-	final float MINIMUM_BALL_SPEED = 5f;
+	final float MAXIMUM_BALL_SPEED = 60f;
+	final float MINIMUM_BALL_SPEED = 15f;
 	final float WALL_WIDTH = 2;
 	float speedX = 0;
 	float speedY = 0;

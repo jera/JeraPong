@@ -7,6 +7,7 @@ import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
+import org.anddev.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
@@ -100,7 +101,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		Log.e("height","" + CAMERA_HEIGHT);
 		v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		final EngineOptions engineOptions = new EngineOptions(true,ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera).setNeedsSound(true);
+		final EngineOptions engineOptions = new EngineOptions(true,ScreenOrientation.LANDSCAPE, new FillResolutionPolicy(), camera).setNeedsSound(true);
 		final Engine engine = new Engine(engineOptions);
 		try {
 			if (MultiTouch.isSupported(this)) {

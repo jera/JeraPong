@@ -9,7 +9,7 @@ import android.app.Activity;
 public class SplashScreen extends BaseSplashPong {
 		
 	private static final int SPLASH_DURATION = 3;
-	private static final float SPLASH_SCALE_FROM = 0.8f;
+	private static final float SPLASH_SCALE_FROM = 0f;
 
 	@Override
 	protected ScreenOrientation getScreenOrientation() {
