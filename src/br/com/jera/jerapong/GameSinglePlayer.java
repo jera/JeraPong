@@ -100,7 +100,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	float speedX = 0;
 	float speedY = 0;
 	boolean refreshVelocity = false;
-	boolean activeBall = false;
+	public boolean activeBall = false;
 
 	final int PLAYER_BORDER_OFFSET = 100;
 	boolean removeBall = false;

@@ -31,30 +31,8 @@ public class SubmitScore extends Dialog {
 				}else{
 					erro.setText("");
 					menu.ScoreMode = 0;
-					
 					dataHelper = new DataHelper(menu.getBaseContext());
 					dataHelper.insert(editText.getEditableText().toString(), menu.gameSinglePlayer.getPlayerScore());
-					
-					Cursor cursor = dataHelper.select();
-					
-					int x = 0;
-					String[] vectorPlayer = new String[5];
-					double[] vectorScore = new double[5];
-					
-					while(cursor.moveToNext()){
-						String player = cursor.getString(1);
-						double score = cursor.getDouble(2);
-						
-						vectorPlayer[x] = player;
-						vectorScore[x] = score;
-						x++;
-					}
-					
-					cursor.close();
-					dataHelper.close();
-					
-					menu.LoadingScoreScreen();
-					menu.scoreScreen.ScoreScene(vectorPlayer,vectorScore);
 					menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
 					dismiss();
 				}
