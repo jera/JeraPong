@@ -84,7 +84,6 @@ public abstract class BaseSplashPong extends BaseGameActivity {
 
 	@Override
 	public void onLoadResources() {
-		
 		final Texture loadingScreenTexture = TextureFactory.createForTextureSourceSize(this.mSplashTextureSource, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mLoadingScreenTextureRegion = TextureRegionFactory.createFromSource(loadingScreenTexture, this.mSplashTextureSource, 0, 0);
 
@@ -95,8 +94,8 @@ public abstract class BaseSplashPong extends BaseGameActivity {
 	public Scene onLoadScene() {
 		
 		final float splashDuration = this.getSplashDuration();
-
-		final SplashScene splashScene = new SplashScene(this.mCamera, this.mLoadingScreenTextureRegion, splashDuration, this.getSplashScaleFrom(), this.getSplashScaleTo());
+		//final SplashScene splashScene = new SplashScene(this.mCamera, this.mLoadingScreenTextureRegion, splashDuration, this.getSplashScaleFrom(), this.getSplashScaleTo());
+		final SplashScene splashScene = new SplashScene(this.mCamera, this.mLoadingScreenTextureRegion);
 		splashScene.setBackground(new ColorBackground(1,1,1));
 		
 		splashScene.registerUpdateHandler(new TimerHandler(splashDuration, new ITimerCallback() {

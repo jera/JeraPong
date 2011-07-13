@@ -25,9 +25,11 @@ import org.anddev.andengine.util.Debug;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
@@ -78,6 +80,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public float timePassed;
 	public boolean gameRunning = false;
 	private boolean onOff = true;
+	Vibrator v;
 	
 	Scene scene;
 	/** ######## MENU ######## **/
@@ -87,6 +90,9 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		
 		CAMERA_HEIGHT = getWindowManager().getDefaultDisplay().getHeight();
 		CAMERA_WIDTH = getWindowManager().getDefaultDisplay().getWidth();
+		Log.e("width","" + CAMERA_WIDTH);
+		Log.e("height","" + CAMERA_HEIGHT);
+		v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		final EngineOptions engineOptions = new EngineOptions(true,ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera).setNeedsSound(true);
 		final Engine engine = new Engine(engineOptions);
@@ -338,7 +344,8 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 			this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontVictory());
 			
 			try {
-				this.gameSinglePlayer.pingSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/ping.wav");
+				this.gameSinglePlayer.pingSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/ping.mp3");
+				this.gameSinglePlayer.finalSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/final_sp.mp3");
 			} catch (final IOException e) {
 				Debug.e(e);
 		}
@@ -353,10 +360,11 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.gameMultiPlayer.setTextureBackground( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 		this.gameMultiPlayer.setTexturePlayer1(new Texture(128,256,TextureOptions.DEFAULT));
 		this.gameMultiPlayer.setTexturePlayer2(new Texture(128,256,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureWin(new Texture(256,256,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureLoose(new Texture(256,256,TextureOptions.DEFAULT));
+		this.gameMultiPlayer.setTextureWin(new Texture(512,256,TextureOptions.DEFAULT));
+		this.gameMultiPlayer.setTextureLoose(new Texture(512,256,TextureOptions.DEFAULT));
 		this.gameMultiPlayer.setTextureBall(new Texture(128,128,TextureOptions.DEFAULT));
 		this.gameMultiPlayer.setTextureScore(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+		this.gameMultiPlayer.setTextureReadySetGo(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 		this.gameMultiPlayer.setTextureVictory(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 		this.gameMultiPlayer.setTexturePause(new Texture(256,64,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 		this.gameMultiPlayer.setTextureBarRight(new Texture(128,1024,TextureOptions.DEFAULT));
@@ -371,7 +379,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.gameMultiPlayer.setTextureRegionPlayer1(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer1(), this, "gfx/game/racket_right.png",0,0));
 		this.gameMultiPlayer.setTextureRegionPlayer2(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer2(), this, "gfx/game/racket_left.png",0,0));
 		this.gameMultiPlayer.setTextureRegionWin(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureWin(), this, "gfx/game/you_win.png",0,0));
-		this.gameMultiPlayer.setTextureRegionLoose(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureLoose(), this, "gfx/game/you_loose.png",0,0));
+		this.gameMultiPlayer.setTextureRegionLoose(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureLoose(), this, "gfx/game/you_lose.png",0,0));
 		this.gameMultiPlayer.setTextureRegionBall(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBall(), this, "gfx/game/disc.png",0,0));
 		this.gameMultiPlayer.setTextureRegionPause(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePause(), this, "gfx/game/pause.png", 0, 0));
 		this.gameMultiPlayer.setTextureRegionBarRight(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBarRight(), this, "gfx/game/bar_right.png", 0, 0));
@@ -384,6 +392,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		
 		this.gameMultiPlayer.setFontScore(new Font(this.gameMultiPlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
 		this.gameMultiPlayer.setFontVictory(new Font(this.gameMultiPlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
+		this.gameMultiPlayer.setFontReadySetGo(new Font(this.gameMultiPlayer.getTextureReadySetGo(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
 
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBackground());
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer1());
@@ -392,6 +401,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureLoose());
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBall());
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureScore());
+		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureReadySetGo());
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureVictory());
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePause());
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBarRight());
@@ -403,9 +413,11 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePauseMainMenu());
 		this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontScore());
 		this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontVictory());
+		this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontReadySetGo());
 		
 		try {
-			this.gameMultiPlayer.pingSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/ping.wav");
+			this.gameMultiPlayer.pingSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/ping.mp3");
+			this.gameMultiPlayer.finalSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/final_mp.mp3");
 		} catch (final IOException e) {
 			Debug.e(e);
 		}

@@ -108,6 +108,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	float tempo;
 
 	public Sound pingSound;
+	public Sound finalSound;
 	Scene scene;
 	private CameraScene pauseGameScene;	
 	public String choiceMap;
@@ -271,7 +272,10 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 				if(pauseGameScene.getChildCount() == 5){
 					pauseGameScene.detachChild(buttonPauseContinue);
 				}				
-				scene.setChildScene(this.pauseGameScene, false, true, true);				
+				scene.setChildScene(this.pauseGameScene, false, true, true);
+				if(menuScreen.sound == 1){
+					finalSound.play();
+				}
 				
 				// here dialog input text
 				menuScreen.runOnUiThread(new Runnable() {
@@ -279,7 +283,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 					public void run() {
 						menuScreen.showDialog(SUBMIT_DIALOG);
 					}
-				});
+				});				
 			}
 			else{
 				if(menuScreen.sound == 1){
