@@ -256,7 +256,16 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		/**
 		 * Ball
 		 */
-		this.spriteBall = new Sprite((CAMERA_WIDTH / 2) - (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (this.textureRegionBall.getHeight() / 2), this.textureRegionBall);
+		this.spriteBall = new Sprite((CAMERA_WIDTH / 2) - (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (this.textureRegionBall.getHeight() / 2), this.textureRegionBall){
+			@Override
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
+				final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+					bodyBall.setLinearVelocity(-17,15);
+					activeBall = true;
+				return false;
+			}
+		};
+		scene.registerTouchArea(spriteBall);
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
 		scene.attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
@@ -264,8 +273,8 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		scene.registerUpdateHandler(new TimerHandler(5f, false,new ITimerCallback() {
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler) {
-				bodyBall.setLinearVelocity(-17,15);
-				activeBall = true;
+				/*bodyBall.setLinearVelocity(-17,15);
+				activeBall = true;*/
 			}
 		}));
 		
