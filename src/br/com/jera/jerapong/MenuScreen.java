@@ -14,7 +14,6 @@ import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
 import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
 import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
-import org.anddev.andengine.extension.physics.box2d.PhysicsWorld;
 import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.Texture;
@@ -48,6 +47,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public boolean LoadingGameSinglePlayer = false;
 	public boolean LoadingGameMultiPlayer = false;
 	public int ScoreMode = 0;
+	
 	
 	/** ######## ENGINE ######## **/
 	
