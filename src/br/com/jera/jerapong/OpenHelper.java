@@ -35,7 +35,12 @@ class OpenHelper extends SQLiteOpenHelper {
 		
 		Log.e(DataHelper.LOG_TAG, "Creating table ok");
 		Log.e(DataHelper.LOG_TAG, "inserting data into table wait");
-		db.execSQL("INSERT INTO ranking(rank_player,rank_score) VALUES ('Rasley',35.50)");
+		db.execSQL("INSERT INTO ranking(rank_player,rank_score) VALUES ('MacGyver',35.50)");
+		db.execSQL("INSERT INTO ranking(rank_player,rank_score) VALUES ('Chuck Norris',27.30)");
+		db.execSQL("INSERT INTO ranking(rank_player,rank_score) VALUES ('Yoda',25.50)");
+		db.execSQL("INSERT INTO ranking(rank_player,rank_score) VALUES ('Awei',22.00)");
+		db.execSQL("INSERT INTO ranking(rank_player,rank_score) VALUES ('Bruce Lee',21.50)");
+		
 		Log.e(DataHelper.LOG_TAG, "inserting data into table OK");
  
 		db.setTransactionSuccessful();
