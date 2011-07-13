@@ -39,6 +39,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	public static final int SUBMIT_DIALOG = 666;
 	public static final int SELECT_MAP = 6;
 	private String playerScore;
+	private DataHelper data;
 
 	private MenuScreen menuScreen;
 
@@ -121,11 +122,14 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	}
 
 	public void GameScene() {
+		
+		Log.e("scene game", "loading");
+		
 		CreateGameMenu();
-
+		
 		scene = new Scene(2);
 		scene.setOnAreaTouchTraversalFrontToBack();
-
+		
 		this.physicWorld = new FixedStepPhysicsWorld(50,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
 		this.PTM_RATIO = PhysicsConnector.PIXEL_TO_METER_RATIO_DEFAULT;
@@ -231,22 +235,32 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		/**
 		 * Ball
 		 */
-		this.spriteBall = new Sprite((CAMERA_WIDTH / 2)	- (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - 
-				(this.textureRegionBall.getHeight() / 2),this.textureRegionBall);
+		this.spriteBall = new Sprite((CAMERA_WIDTH / 2)	- (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (this.textureRegionBall.getHeight() / 2),this.textureRegionBall){
+			@Override
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
+				final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+					menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
+					bodyBall.setLinearVelocity(-17,15);
+					activeBall = true;
+				return false;
+			}
+		};
+		scene.registerTouchArea(spriteBall);
 		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall, BodyType.DynamicBody, FIXTURE_BALL);
 		scene.attachChild(spriteBall);
 		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));
 		scene.registerUpdateHandler(new TimerHandler(5f, false,new ITimerCallback() {
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler) {
-				menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
+				/*menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
 				bodyBall.setLinearVelocity(-17,15);
-				activeBall = true;
+				activeBall = true;*/
 			}
 		}));		
-
+		
 		scene.setTouchAreaBindingEnabled(true);
 		menuScreen.getEngine().setScene(scene);
+		
 		Log.e("scene game", "OK");
 	}
 

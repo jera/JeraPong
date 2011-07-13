@@ -136,7 +136,6 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	boolean finalGameSound = false;
 	int timerReadySetGo;
 
-	private Runnable timerResetBall;
 
 	/** ######## GAME ######## **/
 
@@ -151,7 +150,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		HALF_CAMERA_WIDTH = CAMERA_WIDTH / 2;
 		HALF_CAMERA_HEIGHT = CAMERA_HEIGHT / 2;
 
-		scene = new Scene(2);
+		scene = new Scene(3);
 		scene.setOnAreaTouchTraversalFrontToBack();
 
 		this.physicWorld = new FixedStepPhysicsWorld(50,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
@@ -189,7 +188,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 
 		scorePlayer1 = new ChangeableText((CAMERA_WIDTH / 2) - 50,30,this.fontScore,"0","0".length());
 		scorePlayer2 = new ChangeableText((CAMERA_WIDTH / 2) + 20,30,this.fontScore,"0","0".length());
-		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 40,(CAMERA_HEIGHT / 2) - 40,this.fontReadySetGo,"Ready","Ready".length());
+		readySetGo = new ChangeableText((CAMERA_WIDTH / 2) - 40,(CAMERA_HEIGHT / 2) - 40,this.fontReadySetGo,"Tap","Tap".length());
 		//readySetGo.setPosition(HALF_CAMERA_WIDTH - readySetGo.getWidth() / 2,HALF_CAMERA_HEIGHT - readySetGo.getHeight() / 2);
 		//readySetGo.setVisible(false);
 
@@ -276,18 +275,25 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		/**
 		 * Ball
 		 */
-		this.spriteBall = new Sprite((CAMERA_WIDTH / 2) - (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (this.textureRegionBall.getHeight() / 2), this.textureRegionBall);
-		this.bodyBall = PhysicsFactory.createCircleBody(physicWorld, spriteBall.getInitialX(), spriteBall.getInitialY(), 25f, 0,BodyType.DynamicBody, FIXTURE_BALL);
-
-		scene.attachChild(spriteBall);
-		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));		
-		scene.registerUpdateHandler(new TimerHandler(3f, false,new ITimerCallback() {
+		playerTime = 1;
+		this.spriteBall = new Sprite((CAMERA_WIDTH / 2) - (this.textureRegionBall.getWidth() / 2), (CAMERA_HEIGHT / 2) - (this.textureRegionBall.getHeight() / 2), this.textureRegionBall){
 			@Override
-			public void onTimePassed(final TimerHandler pTimerHandler) {
-				playerTime = 1;
-				ballInitialPosition();
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
+				final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+					readySetGo.setVisible(false);
+					if(playerTime == 1){
+						bodyBall.setLinearVelocity(-8,12);
+					}else{
+						bodyBall.setLinearVelocity(8,12);
+					}
+					activeBall = true;
+				return false;
 			}
-		}));	
+		};
+		scene.registerTouchArea(spriteBall);
+		this.bodyBall = PhysicsFactory.createCircleBody(this.physicWorld,spriteBall,BodyType.DynamicBody,FIXTURE_BALL);
+		scene.attachChild(spriteBall);
+		this.physicWorld.registerPhysicsConnector(new PhysicsConnector(spriteBall, bodyBall, true, true));			
 
 		scene.attachChild(readySetGo);
 		scene.setTouchAreaBindingEnabled(true);
@@ -327,9 +333,9 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 					scene.setChildScene(this.endGameScene, false, true, true);
 				}
 				else{
+					readySetGo.setVisible(true);
 					resetBall = true;
-					playerTime = 1;
-					ballInitialPosition();
+					playerTime = 1;					
 				}				
 			}else if(bodyContact1.equals(bodyBarRight) || bodyContact2.equals(bodyBarRight)){
 				menuScreen.v.vibrate(vibrateTime);
@@ -355,9 +361,9 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 					scene.setChildScene(this.endGameScene, false, true, true);
 				}
 				else{
+					readySetGo.setVisible(true);
 					resetBall = true;
 					playerTime = 2;
-					ballInitialPosition();
 				}
 			}
 			if(menuScreen.sound == 1){
@@ -420,7 +426,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 
 	}
 
-	public void ballInitialPosition(){		
+	/*public void ballInitialPosition(){		
 		readySetGo.setText("Ready");
 		readySetGo.setVisible(true);
 		timerReadySetGo = 1;
@@ -434,12 +440,12 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 					timerReadySetGo = 5;					
 					readySetGo.setText("Go!");
 					menuScreen.runOnUpdateThread(timerResetBall());					
-					/*scene.registerUpdateHandler(new TimerHandler(0.5f, false,new ITimerCallback() {
-						@Override
-						public void onTimePassed(final TimerHandler pTimerHandler) {
-							readySetGo.setVisible(false);
-						}
-					}));*/
+					//scene.registerUpdateHandler(new TimerHandler(0.5f, false,new ITimerCallback() {
+					//	@Override
+					//	public void onTimePassed(final TimerHandler pTimerHandler) {
+					//		readySetGo.setVisible(false);
+					//	}
+					//}));
 				}
 			}
 		}));		
@@ -460,7 +466,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 			};
 		}
 		return this.timerResetBall;
-	}
+	}*/
 
 	@Override
 	public void preSolve(Contact pContact) {

@@ -33,16 +33,18 @@ public class SelectMapDialog extends Dialog {
 				button.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						if(menu.modeSelected == 1){
-							menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
-							menu.gameRunning = true;
-							menu.LoadingGameSinglePlayer(currentMap);
-							menu.gameSinglePlayer.GameScene();
+								menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
+								menu.gameRunning = true;
+								menu.LoadingGameSinglePlayer(currentMap);							
+								menu.gameSinglePlayer.GameScene();
+								menu.LoadingGameSinglePlayer = true;
 						}
 						else{
-							menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
-							menu.gameRunning = true;
-							menu.LoadingGameMultiPlayer(currentMap);
-							menu.gameMultiPlayer.GameScene();
+								menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
+								menu.gameRunning = true;
+								menu.LoadingGameMultiPlayer(currentMap);
+								menu.gameMultiPlayer.GameScene();
+								menu.LoadingGameMultiPlayer = true;
 						}
 						dismiss();
 					}
