@@ -134,7 +134,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 	public void GameScene() {		
 		CreateGameMenu();
 		
-		scene = new Scene(2);
+		scene = new Scene(3);
 		scene.setOnAreaTouchTraversalFrontToBack();
 
 		this.physicWorld = new FixedStepPhysicsWorld(50,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);

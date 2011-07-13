@@ -1,13 +1,5 @@
 package br.com.jera.jerapong;
 
-<<<<<<< HEAD
-import java.util.HashMap;
-import java.util.Map;
-
-import org.anddev.andengine.entity.scene.Scene;
-
-=======
->>>>>>> 5d55495b372359e4addba40bda68cf84f694c563
 import android.app.Activity;
 import android.app.Dialog;
 import android.util.Log;
@@ -40,28 +32,19 @@ public class SelectMapDialog extends Dialog {
 				button.setImageResource(activity.getApplicationContext().getResources().getIdentifier(currentMap + "_thumb", "drawable", "br.com.jera.jerapong"));
 				button.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
-						
 						if(menu.modeSelected == 1){
-<<<<<<< HEAD
 								menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
 								menu.gameRunning = true;
-								
 								menu.LoadingGameSinglePlayer(currentMap);							
 								menu.gameSinglePlayer.GameScene();
 								menu.LoadingGameSinglePlayer = true;
-=======
-							menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
-							menu.gameRunning = true;
-							menu.LoadingGameSinglePlayer(currentMap);
-							menu.gameSinglePlayer.GameScene();
->>>>>>> 5d55495b372359e4addba40bda68cf84f694c563
 						}
 						else{
 								menu.timePassed = menu.getEngine().getSecondsElapsedTotal();
 								menu.gameRunning = true;
 								menu.LoadingGameMultiPlayer(currentMap);
 								menu.gameMultiPlayer.GameScene();
-								menu.LoadingGameSinglePlayer = true;
+								menu.LoadingGameMultiPlayer = true;
 						}
 						dismiss();
 					}

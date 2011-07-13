@@ -47,7 +47,7 @@ public class ScoreScreen {
 	
 	public void ScoreScene(String[] vectorPlayer, double[] vectorScore) {
 		
-		this.scene = new Scene(2);
+		this.scene = new Scene(4);
 		this.scene.setOnAreaTouchTraversalFrontToBack();
 		
 		/** Background */

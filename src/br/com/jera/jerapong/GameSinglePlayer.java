@@ -121,12 +121,12 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 	}
 
 	public void GameScene() {
-		
-		scene = new Scene(2);
-		
-		scene.setOnAreaTouchTraversalFrontToBack();
+		Log.e("scene game", "loading");
 		
 		CreateGameMenu();
+		
+		scene = new Scene(2);
+		scene.setOnAreaTouchTraversalFrontToBack();
 		
 		this.physicWorld = new FixedStepPhysicsWorld(50,new Vector2(0,0),false);//PhysicsWorld(new Vector2(0,0),false);
 		this.physicWorld.setContactListener(this);
@@ -249,6 +249,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 		scene.setTouchAreaBindingEnabled(true);
 		menuScreen.getEngine().setScene(scene);
+		
 		Log.e("scene game", "OK");
 	}
 

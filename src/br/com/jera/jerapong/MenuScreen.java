@@ -37,6 +37,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	/** ######## GLOBAL ######## **/
 	
 	private int CAMERA_WIDTH = 0;
+	private int count = 0;
 	private int CAMERA_HEIGHT = 0;	
 	public GameMultiPlayer gameMultiPlayer;
 	public GameSinglePlayer gameSinglePlayer;
@@ -44,6 +45,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public static String choiceMap;
 	public int sound = 1;
 	public boolean LoadingGameSinglePlayer = false;
+	public boolean LoadingGameMultiPlayer = false;
 	public int ScoreMode = 0;
 	
 	/** ######## ENGINE ######## **/
@@ -140,7 +142,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 
 	@Override
 	public Scene onLoadScene() {
-		//this.mEngine.registerUpdateHandler(new FPSLogger());
 		return SceneMenu(this);
 	}
 
@@ -151,7 +152,6 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	public Scene SceneMenu(final Activity activity){
 		scene = new Scene(1);
 		//scene.setOnSceneTouchListener(this);
-		
 		/**
 		 * Menu background resources
 		 */
@@ -296,18 +296,17 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	}
 	
 	public void LoadingGameSinglePlayer(String currentMap){
-			Log.e("carregando"," ok " );
 			
+			Log.e("carregando"," ok : Value : " + this.count );
+			this.count++;
 			this.gameSinglePlayer.setCAMERA_HEIGHT(CAMERA_HEIGHT);
 			this.gameSinglePlayer.setCAMERA_WIDTH(CAMERA_WIDTH);
-			
-			this.mEngine.getTextureManager().unloadTexture(this.gameSinglePlayer.getTextureBackground());
 			
 			this.gameSinglePlayer.setTextureBackground( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 			this.gameSinglePlayer.setTextureRegionBackground( TextureRegionFactory.createFromAsset(this.gameSinglePlayer.getTextureBackground(), this, "gfx/maps/" + currentMap + ".jpg",0,0));
 			this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTextureBackground());
 			
-			if(this.LoadingGameSinglePlayer == false){
+			
 				this.gameSinglePlayer.setTexturePlayer1(new Texture(128,256,TextureOptions.DEFAULT));
 				this.gameSinglePlayer.setTextureBall(new Texture(128,128,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
 				this.gameSinglePlayer.setTextureScore(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
@@ -346,8 +345,7 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 				this.mEngine.getTextureManager().loadTexture(this.gameSinglePlayer.getTexturePauseMainMenu());
 				this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontScore());
 				this.mEngine.getFontManager().loadFont(this.gameSinglePlayer.getFontVictory());
-			}
-			
+				
 			try {
 				this.gameSinglePlayer.pingSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/ping.wav");
 			} catch (final IOException e) {
@@ -362,58 +360,60 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 		this.gameMultiPlayer.setCAMERA_WIDTH(CAMERA_WIDTH);
 		
 		this.gameMultiPlayer.setTextureBackground( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
-		this.gameMultiPlayer.setTexturePlayer1(new Texture(128,256,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTexturePlayer2(new Texture(128,256,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureWin(new Texture(256,256,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureLoose(new Texture(256,256,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureBall(new Texture(128,128,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureScore(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
-		this.gameMultiPlayer.setTextureVictory(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
-		this.gameMultiPlayer.setTexturePause(new Texture(256,64,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
-		this.gameMultiPlayer.setTextureBarRight(new Texture(128,1024,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureBarLeft(new Texture(128,1024,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureBGScore(new Texture(256,128,TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTextureBackgroundPause( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
-		this.gameMultiPlayer.setTexturePauseContinue( new Texture(256, 64, TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTexturePauseNewGame( new Texture(256, 64, TextureOptions.DEFAULT));
-		this.gameMultiPlayer.setTexturePauseMainMenu( new Texture(256, 64, TextureOptions.DEFAULT));
-		
 		this.gameMultiPlayer.setTextureRegionBackground( TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBackground(), this, "gfx/maps/" + currentMap + ".jpg",0,0));
-		this.gameMultiPlayer.setTextureRegionPlayer1(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer1(), this, "gfx/game/racket_right.png",0,0));
-		this.gameMultiPlayer.setTextureRegionPlayer2(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer2(), this, "gfx/game/racket_left.png",0,0));
-		this.gameMultiPlayer.setTextureRegionWin(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureWin(), this, "gfx/game/you_win.png",0,0));
-		this.gameMultiPlayer.setTextureRegionLoose(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureLoose(), this, "gfx/game/you_loose.png",0,0));
-		this.gameMultiPlayer.setTextureRegionBall(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBall(), this, "gfx/game/disc.png",0,0));
-		this.gameMultiPlayer.setTextureRegionPause(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePause(), this, "gfx/game/pause.png", 0, 0));
-		this.gameMultiPlayer.setTextureRegionBarRight(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBarRight(), this, "gfx/game/bar_right.png", 0, 0));
-		this.gameMultiPlayer.setTextureRegionBarLeft(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBarLeft(), this, "gfx/game/bar_left.png", 0, 0));
-		this.gameMultiPlayer.setTextureRegionBGScore(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBGScore(), this, "gfx/game/score_bg_mp.png", 0, 0));
-		this.gameMultiPlayer.setTextureRegionBackgroundPause(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBackgroundPause(), this, "gfx/pause/pause_bg.jpg", 0, 0));
-		this.gameMultiPlayer.setTextureRegionPauseContinue(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePauseContinue(), this, "gfx/pause/button_continue.png", 0, 0));
-		this.gameMultiPlayer.setTextureRegionPauseNewGame(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePauseNewGame(), this, "gfx/pause/button_new_game.png", 0, 0));
-		this.gameMultiPlayer.setTextureRegionPauseMainMenu(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePauseMainMenu(), this, "gfx/pause/button_main_menu.png", 0, 0));		
-		
-		this.gameMultiPlayer.setFontScore(new Font(this.gameMultiPlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
-		this.gameMultiPlayer.setFontVictory(new Font(this.gameMultiPlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
-
 		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBackground());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer1());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer2());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureWin());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureLoose());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBall());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureScore());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureVictory());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePause());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBarRight());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBarLeft());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBGScore());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBackgroundPause());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePauseContinue());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePauseNewGame());
-		this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePauseMainMenu());
-		this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontScore());
-		this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontVictory());
+		
+		
+			this.gameMultiPlayer.setTexturePlayer1(new Texture(128,256,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTexturePlayer2(new Texture(128,256,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTextureWin(new Texture(256,256,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTextureLoose(new Texture(256,256,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTextureBall(new Texture(128,128,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTextureScore(new Texture(256,256,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+			this.gameMultiPlayer.setTextureVictory(new Texture(512,512,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+			this.gameMultiPlayer.setTexturePause(new Texture(256,64,TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+			this.gameMultiPlayer.setTextureBarRight(new Texture(128,1024,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTextureBarLeft(new Texture(128,1024,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTextureBGScore(new Texture(256,128,TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTextureBackgroundPause( new Texture(2048, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA));
+			this.gameMultiPlayer.setTexturePauseContinue( new Texture(256, 64, TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTexturePauseNewGame( new Texture(256, 64, TextureOptions.DEFAULT));
+			this.gameMultiPlayer.setTexturePauseMainMenu( new Texture(256, 64, TextureOptions.DEFAULT));
+			
+			this.gameMultiPlayer.setTextureRegionPlayer1(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer1(), this, "gfx/game/racket_right.png",0,0));
+			this.gameMultiPlayer.setTextureRegionPlayer2(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePlayer2(), this, "gfx/game/racket_left.png",0,0));
+			this.gameMultiPlayer.setTextureRegionWin(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureWin(), this, "gfx/game/you_win.png",0,0));
+			this.gameMultiPlayer.setTextureRegionLoose(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureLoose(), this, "gfx/game/you_loose.png",0,0));
+			this.gameMultiPlayer.setTextureRegionBall(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBall(), this, "gfx/game/disc.png",0,0));
+			this.gameMultiPlayer.setTextureRegionPause(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePause(), this, "gfx/game/pause.png", 0, 0));
+			this.gameMultiPlayer.setTextureRegionBarRight(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBarRight(), this, "gfx/game/bar_right.png", 0, 0));
+			this.gameMultiPlayer.setTextureRegionBarLeft(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBarLeft(), this, "gfx/game/bar_left.png", 0, 0));
+			this.gameMultiPlayer.setTextureRegionBGScore(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBGScore(), this, "gfx/game/score_bg_mp.png", 0, 0));
+			this.gameMultiPlayer.setTextureRegionBackgroundPause(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTextureBackgroundPause(), this, "gfx/pause/pause_bg.jpg", 0, 0));
+			this.gameMultiPlayer.setTextureRegionPauseContinue(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePauseContinue(), this, "gfx/pause/button_continue.png", 0, 0));
+			this.gameMultiPlayer.setTextureRegionPauseNewGame(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePauseNewGame(), this, "gfx/pause/button_new_game.png", 0, 0));
+			this.gameMultiPlayer.setTextureRegionPauseMainMenu(TextureRegionFactory.createFromAsset(this.gameMultiPlayer.getTexturePauseMainMenu(), this, "gfx/pause/button_main_menu.png", 0, 0));		
+			
+			this.gameMultiPlayer.setFontScore(new Font(this.gameMultiPlayer.getTextureScore(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 48, true, Color.WHITE));
+			this.gameMultiPlayer.setFontVictory(new Font(this.gameMultiPlayer.getTextureVictory(), Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 30, true, Color.WHITE));
+	
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer1());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePlayer2());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureWin());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureLoose());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBall());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureScore());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureVictory());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePause());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBarRight());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBarLeft());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBGScore());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTextureBackgroundPause());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePauseContinue());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePauseNewGame());
+			this.mEngine.getTextureManager().loadTexture(this.gameMultiPlayer.getTexturePauseMainMenu());
+			this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontScore());
+			this.mEngine.getFontManager().loadFont(this.gameMultiPlayer.getFontVictory());
 		
 		try {
 			this.gameMultiPlayer.pingSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "sfx/ping.wav");
