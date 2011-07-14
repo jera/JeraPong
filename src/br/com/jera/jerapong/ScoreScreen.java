@@ -58,7 +58,7 @@ public class ScoreScreen {
 		this.scene.attachChild(background);
 		
 		/** Background */
-		int height = (CAMERA_HEIGHT - CAMERA_HEIGHT) + 200;
+		int height = (CAMERA_HEIGHT - CAMERA_HEIGHT) + 130;
 		/** Table for ranking */
 		for(int x = 0; 5 > x; x++){
 			
@@ -95,8 +95,8 @@ public class ScoreScreen {
 			scene.attachChild(this.spriteBtnNewGame);
 			scene.registerTouchArea(this.spriteBtnNewGame);
 		}
-		int WidthBtnBack = (this.CAMERA_WIDTH / 2) + 70;
-		int HeightBtnBack = (this.CAMERA_HEIGHT /2) - (this.textureRegionBtnBack.getHeight() / 2) + 165;
+		int WidthBtnBack = (this.CAMERA_WIDTH / 2) - (this.textureRegionBtnBack.getWidth() / 2);
+		int HeightBtnBack = (this.CAMERA_HEIGHT /2) - (this.textureRegionBtnBack.getHeight() / 2) + 200;
 		
 		this.spriteBtnBack = new Sprite(WidthBtnBack, HeightBtnBack, this.textureRegionBtnBack){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {				

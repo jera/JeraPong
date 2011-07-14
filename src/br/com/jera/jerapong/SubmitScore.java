@@ -1,7 +1,7 @@
 package br.com.jera.jerapong;
 
+import br.com.jeramobstats.JeraAgent;
 import android.app.Dialog;
-import android.database.Cursor;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +29,7 @@ public class SubmitScore extends Dialog {
 					erro.setText("O nome do jogador não pode ser vazio!");
 					erro.setVisibility(1);
 				}else{
+					JeraAgent.logEvent("SUBMIT_SCORE");
 					erro.setText("");
 					menu.ScoreMode = 0;
 					dataHelper = new DataHelper(menu.getBaseContext());

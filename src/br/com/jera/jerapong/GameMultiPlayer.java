@@ -21,6 +21,7 @@ import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 
 import android.util.Log;
+import br.com.jeramobstats.JeraAgent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -578,6 +579,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		posY = hCameraV - middleTextureRegionVerticalSizeByTwo(textureRegionPauseNewGame);
 		final Sprite buttonPauseNewGame = new Sprite(posX,posY,textureRegionPauseNewGame){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				JeraAgent.logEvent("MP_TO_NEW_GAME");
 				scene.clearChildScene();
 				menuScreen.gameRunning = true;
 				pointsPlayer1 = 0;
@@ -599,6 +601,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 		posY = hCameraV + middleTextureRegionVerticalSizeByTwo(textureRegionPauseMainMenu) + 15;
 		final Sprite buttonPauseMainMenu = new Sprite(posX,posY,textureRegionPauseMainMenu){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				JeraAgent.logEvent("MP_TO_MAIN_MENU");
 				scene.clearChildScene();
 				menuScreen.getEngine().setScene(menuScreen.scene);
 				return false;

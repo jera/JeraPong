@@ -6,5 +6,10 @@
 	<classpathentry kind="lib" path="lib/andengine.jar"/>
 	<classpathentry kind="lib" path="lib/andenginephysicsbox2dextension.jar"/>
 	<classpathentry kind="lib" path="lib/andenginemultitouchextension.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Android-Util"/>
+	<classpathentry kind="src" path="Android-Util_src"/>
+	<classpathentry kind="lib" path="/Android-Util/lib/XtifyAndroidSDK.jar"/>
+	<classpathentry kind="lib" path="/Android-Util/lib/jeraMobStats.jar"/>
+	<classpathentry kind="lib" path="/Android-Util/lib/FlurryAgent.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -21,6 +21,7 @@ import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 
 import android.util.Log;
+import br.com.jeramobstats.JeraAgent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -84,6 +85,8 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 
 	private Sprite spriteBarRight;
 	private Body bodyBarRight;
+	
+	private Sprite bgScore;
 
 	private Sprite spriteBall;
 	private Body bodyBall;
@@ -181,13 +184,15 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		 */
 		int positionX = 10;
 		int positionY = 20;
-		final Sprite bgScore = new Sprite(positionX,positionY,this.textureRegionBGScore);
+		bgScore = new Sprite(positionX,positionY,this.textureRegionBGScore);
+		bgScore.setVisible(false);
 		scene.attachChild(bgScore);
 
 		/**
 		 * Timer
 		 */
 		timePlaying = new ChangeableText(20, 30,this.fontScore, "0.0", "00000.0".length());
+		timePlaying.setVisible(false);
 		scene.attachChild(timePlaying);
 		scene.registerUpdateHandler(new TimerHandler(0.1f, true,
 				new ITimerCallback() {
@@ -252,8 +257,10 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
 				final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-					readySetGo.setVisible(false);
 					menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal();
+					readySetGo.setVisible(false);
+					timePlaying.setVisible(true);
+					bgScore.setVisible(true);
 					menuScreen.runOnUpdateThread(initialBallVelocityLeft());
 					activeBall = true;
 				return false;
@@ -552,8 +559,9 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		posY = hCameraV - middleTextureRegionVerticalSizeByTwo(textureRegionPauseNewGame);
 		final Sprite buttonPauseNewGame = new Sprite(posX,posY,textureRegionPauseNewGame){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-				menuScreen.gameRunning = true;
-				timePlaying.setVisible(true);
+				JeraAgent.logEvent("SP_TO_NEW_GAME");
+				timePlaying.setVisible(false);
+				bgScore.setVisible(false);
 				menuScreen.timePassed = menuScreen.getEngine().getSecondsElapsedTotal(); 
 				scene.clearChildScene();				
 				readySetGo.setVisible(true);
@@ -571,6 +579,7 @@ public class GameSinglePlayer implements /*IOnSceneTouchListener,*/ ContactListe
 		posY = hCameraV + middleTextureRegionVerticalSizeByTwo(textureRegionPauseMainMenu) + 15;
 		final Sprite buttonPauseMainMenu = new Sprite(posX,posY,textureRegionPauseMainMenu){
 			public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+				JeraAgent.logEvent("SP_TO_MAIN_MENU");
 				scene.clearChildScene();
 				menuScreen.getEngine().setScene(menuScreen.scene);
 				return false;
