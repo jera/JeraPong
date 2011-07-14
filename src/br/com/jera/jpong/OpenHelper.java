@@ -1,4 +1,4 @@
-package br.com.jera.jerapong;
+package br.com.jera.jpong;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

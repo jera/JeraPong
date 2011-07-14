@@ -1,5 +1,6 @@
-package br.com.jera.jerapong;
+package br.com.jera.jpong;
 
+import br.com.jera.jpong.R;
 import br.com.jeramobstats.JeraAgent;
 import android.app.Dialog;
 import android.view.View;

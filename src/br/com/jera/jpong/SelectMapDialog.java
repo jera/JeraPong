@@ -1,4 +1,4 @@
-package br.com.jera.jerapong;
+package br.com.jera.jpong;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import br.com.jera.jpong.R;
 import br.com.jeramobstats.JeraAgent;
 
 public class SelectMapDialog extends Dialog {
@@ -35,7 +36,7 @@ public class SelectMapDialog extends Dialog {
 			Log.e("map", "Map Current : " + currentMap);
 			ImageButton button = (ImageButton) getLayoutInflater().inflate(R.layout.select_map_button, null);
 			layout.addView(button);
-			button.setImageResource(activity.getApplicationContext().getResources().getIdentifier(currentMap + "_thumb", "drawable", "br.com.jera.jerapong"));
+			button.setImageResource(activity.getApplicationContext().getResources().getIdentifier(currentMap + "_thumb", "drawable", "br.com.jera.jpong"));
 			button.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					if (menu.modeSelected == 1) {

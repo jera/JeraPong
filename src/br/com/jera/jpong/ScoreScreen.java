@@ -1,4 +1,4 @@
-package br.com.jera.jerapong;
+package br.com.jera.jpong;
 
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.sprite.Sprite;
