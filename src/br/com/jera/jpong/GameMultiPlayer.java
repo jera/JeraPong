@@ -358,7 +358,7 @@ public class GameMultiPlayer implements /*IOnSceneTouchListener,*/ ContactListen
 			this.initialBallVelocityRight = new Runnable(){
 				@Override
 				public void run(){
-					bodyBall.setLinearVelocity(-17,15);
+					bodyBall.setLinearVelocity(17,15);
 				}
 			};
 		}

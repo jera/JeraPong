@@ -10,6 +10,5 @@
 	<classpathentry kind="lib" path="/Android-Util/lib/XtifyAndroidSDK.jar"/>
 	<classpathentry kind="lib" path="/Android-Util/lib/jeraMobStats.jar"/>
 	<classpathentry kind="lib" path="/Android-Util/lib/FlurryAgent.jar"/>
-	<classpathentry kind="src" path="Android-Util_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
