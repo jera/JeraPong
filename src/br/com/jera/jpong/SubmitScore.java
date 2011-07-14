@@ -27,7 +27,7 @@ public class SubmitScore extends Dialog {
 		button.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if(editText.getEditableText().toString().equals("") || editText.getEditableText().toString().equals(" ")){
-					erro.setText("O nome do jogador não pode ser vazio!");
+					erro.setText("Player name empty!");
 					erro.setVisibility(1);
 				}else{
 					JeraAgent.logEvent("SUBMIT_SCORE");
