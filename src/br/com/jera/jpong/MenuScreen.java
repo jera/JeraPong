@@ -302,7 +302,9 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 
 	public void LoadingGameSinglePlayer(String currentMap) {
 		
-		Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
+		Toast loading = Toast.makeText(getBaseContext(), "Loading", Toast.LENGTH_SHORT);
+		loading.setGravity(0, 0, 220);
+		loading.show();
 
 		this.gameSinglePlayer.setCAMERA_HEIGHT(CAMERA_HEIGHT);
 		this.gameSinglePlayer.setCAMERA_WIDTH(CAMERA_WIDTH);
@@ -362,7 +364,9 @@ public class MenuScreen extends BaseGameActivity implements IOnSceneTouchListene
 	}
 
 	public void LoadingGameMultiPlayer(String currentMap) {		
-		Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
+		Toast loading = Toast.makeText(getBaseContext(), "Loading", Toast.LENGTH_SHORT);
+		loading.setGravity(0, 0, 220);
+		loading.show();
 		this.gameMultiPlayer = new GameMultiPlayer(this);
 
 		this.gameMultiPlayer.setCAMERA_HEIGHT(CAMERA_HEIGHT);
